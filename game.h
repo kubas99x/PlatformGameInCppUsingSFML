@@ -4,15 +4,25 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "background.h"
+#include "platform.h"
+#include "player.h"
 
 class Game
 {
 private:
     //Window stuff
     sf::RenderWindow * window;
+    sf::Clock clock_;
+    sf::Time time_;
 
     //Backgrounds
     background *background_;
+
+    //Platforms
+    platform *platform_;
+
+    //Player
+    player * player_;
 
 
     //Private void functions

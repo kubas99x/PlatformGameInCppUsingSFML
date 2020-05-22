@@ -13,9 +13,13 @@ SOURCES += \
         background.cpp \
         game.cpp \
         main.cpp \
+        platform.cpp \
+        player.cpp \
         texture_functions.cpp
 
 HEADERS += \
     background.h \
     game.h \
+    platform.h \
+    player.h \
     texture_functions.h

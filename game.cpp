@@ -4,6 +4,8 @@ Game::Game()
 {
     this->initWindow ();
     this->background_ = new background;
+    this->platform_ = new platform;
+    this->player_ = new player;
 }
 
 Game::~Game()
@@ -35,7 +37,13 @@ void Game::updatePollEvents()
 
 void Game::update()
 {
+    this->clock_.restart ();
+
     this->updatePollEvents();
+
+    this->player_->update_hero();
+
+
 }
 
 void Game::gamerender()
@@ -43,6 +51,10 @@ void Game::gamerender()
     this->window->clear ();
 
     this->background_->render (*this->window);
+
+    this->platform_->render (*this->window);
+
+    this->player_->render (*this->window);
 
     this->window->display();
 }
