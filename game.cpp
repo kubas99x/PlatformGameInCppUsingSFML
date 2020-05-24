@@ -6,6 +6,8 @@ Game::Game()
     this->background_ = new background;
     this->platform_ = new platform;
     this->player_ = new player;
+    this->collision_ = new collision;
+
 }
 
 Game::~Game()
@@ -18,6 +20,8 @@ void Game::initWindow()
     this->window->setFramerateLimit(60);
     this->window->setVerticalSyncEnabled(false);
 }
+
+
 
 void Game::updatePollEvents()
 {
@@ -41,8 +45,9 @@ void Game::update()
 
     this->updatePollEvents();
 
-    this->player_->update_hero();
+    //this->platform_->collision_take_platforms (platform_->return_sprites ());       //funkcja ktora wysyla do klasy collision platformy
 
+    this->player_->update_hero();
 
 }
 

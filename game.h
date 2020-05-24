@@ -6,6 +6,7 @@
 #include "background.h"
 #include "platform.h"
 #include "player.h"
+#include "collision.h"
 
 class Game
 {
@@ -24,9 +25,15 @@ private:
     //Player
     player * player_;
 
+    //Collision
+    collision * collision_;
+
 
     //Private void functions
     void initWindow();
+
+    // collision;
+    std::vector <sf::Sprite>  platforms_collisions_;
 
 
 

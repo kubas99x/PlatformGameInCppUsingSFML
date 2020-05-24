@@ -11,6 +11,7 @@ CONFIG(debug, debug|release){
 }
 SOURCES += \
         background.cpp \
+        collision.cpp \
         game.cpp \
         main.cpp \
         platform.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     background.h \
+    collision.h \
     game.h \
     platform.h \
     player.h \

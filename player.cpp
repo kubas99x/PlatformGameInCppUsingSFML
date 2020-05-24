@@ -24,6 +24,13 @@ void player::init_variables()
     this->hero_in_air_=true;
     this->hero_action_=hero_action::standing;
 
+
+}
+
+void player::kolizje()
+{
+    std::vector <sf::Sprite> platformy = return_platforms ();
+    std::cout<<"WHAAAAT:  "<<platformy.size()<<std::endl;
 }
 
 void player::download_textures()
@@ -34,9 +41,6 @@ void player::download_textures()
 
 void player::set_hero_sprites()
 {
-    //Czy w bohaterze bede zmienial teksture i wybieral dane klatki czy jak?
-
-
 
     //standing animations
     for(int i=60; i<170*16; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
@@ -46,7 +50,7 @@ void player::set_hero_sprites()
     //walking animations
     for(int i=60; i<170*8; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
     {
-        walking_animations.emplace_back(sf::IntRect(i,40,40,45));
+        walking_animations.emplace_back(sf::IntRect(i,40,45,45));
     }
 
 }
@@ -66,35 +70,40 @@ void player::update_hero_step_int()
     {
         hero_step_int_standing_++;
         hero_frame_time_=0;
+        hero_animation_change_=true;
     }
     if(hero_frame_time_>=1.0f/13.0f && this->hero_action_==hero_action::walking)
     {
         hero_step_int_walking_++;
         hero_frame_time_=0;
+        hero_animation_change_=true;
     }
 
 }
 void player::choose_hero_animation()
 {
-    if(this->hero_frame_time_==0 && this->hero_action_==hero_action::standing)               //standing
+    if(this->hero_animation_change_ && this->hero_action_==hero_action::standing)               //standing
     {
-        this->hero_.setTexture (this->textures_[0]);
-        this->hero_.setTextureRect (this->standing_animations[this->hero_step_int_standing_]);
-        if(this->hero_step_int_standing_==standing_animations.size ()-1)
+        if(this->hero_step_int_standing_>=standing_animations.size ()-1)
         {
             hero_step_int_standing_=0;
         }
+        this->hero_.setTexture (this->textures_[0]);
+        this->hero_.setTextureRect (this->standing_animations[this->hero_step_int_standing_]);
+
 
     }
-    if(this->hero_frame_time_==0 && this->hero_action_==hero_action::walking)               //walking
+    if(this->hero_animation_change_ && this->hero_action_==hero_action::walking)               //walking
     {
         this->hero_.setTexture (this->textures_[1]);
         this->hero_.setTextureRect (this->walking_animations[this->hero_step_int_walking_]);
-        if(this->hero_step_int_walking_==walking_animations.size ()-1)
+        if(this->hero_step_int_walking_>=walking_animations.size ()-1)
         {
             hero_step_int_walking_=0;
         }
     }
+    this->hero_animation_change_ = false;
+
 
 
 
@@ -102,15 +111,15 @@ void player::choose_hero_animation()
 
 void player::hero_check_moves()
 {
-
-
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        hero_.move (0,velocity_y_*time_.asSeconds ());
+        //bool what=this->check_standing_collision (this->hero_);         //just for a moment
+        hero_.move (0,velocity_x_*time_.asSeconds ());
         this->hero_action_=hero_action::walking;
         any=true;
+        kolizje ();
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))                    //Chwilowe 2 petle by latwiej sprawdzac kolizje
     {
@@ -138,10 +147,12 @@ void player::hero_check_moves()
 
 }
 
-void player::hero_check_in_air()
+void player::hero_gravity_move()
 {
-    if(this->hero_in_air_)
+    //zrob ta funkcje jak juz zrobisz kolizje
+    if(!this->check_standing_collision (hero_))                  //sprawdzamy czy bohater stoi na platformie
     {
+        std::cout<<"no chyba bajgla"<<std::endl;
         if(velocity_y_<10)
         {
         this->velocity_y_+=gravity_*time_.asSeconds ();
@@ -158,13 +169,14 @@ void player::update_hero()
 {
     this->time_ = clock.restart();              //restartuje zegar
 
-    //this->hero_check_in_air ();                 //sprawdza czy bohater znajduje sie w powietrzu
+    //this->hero_gravity_move ();                 //sprawdza czy bohater znajduje sie w powietrzu
 
     this->update_hero_step_int ();              //zwieksza numer wybieranej klatki
 
     this->hero_check_moves ();                  //sprawdza czy bohater sie rusza
 
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
+
 
 }
 

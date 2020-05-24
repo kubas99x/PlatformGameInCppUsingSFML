@@ -4,25 +4,25 @@
 #include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 
+#include <collision.h>
+
 enum class hero_action
     {
         standing,
         walking,
         jumping
     };
-class player : public texture_functions
+class player : public texture_functions, public collision
 {
 private:
     //Time
     sf::Clock clock;
     sf::Time time_;
 
+    //std::vector <sf::Sprite> *wsk = &collision::platforms_collisions_;
+
     //Texture vector
     std::vector <sf::Texture> textures_;
-
-
-    //Hero sprite
-    sf::Sprite hero_;                       //bohater
 
     //elements of sprites
     std::vector <sf::IntRect> standing_animations;
@@ -33,12 +33,14 @@ private:
     void set_hero_sprites();
     void init_variables();
 
+    void kolizje();
+
     //hero functions
     void set_hero();
     void update_hero_step_int();
     void choose_hero_animation();
     void hero_check_moves();
-    void hero_check_in_air();
+    void hero_gravity_move();
 
     //hero variables
     float hero_frame_time_;
@@ -58,6 +60,9 @@ private:
     bool walking_;
     bool hero_in_air_;
 
+protected:
+    //Hero sprite
+    sf::Sprite hero_;                       //bohater
 public:
     player();
     ~player();

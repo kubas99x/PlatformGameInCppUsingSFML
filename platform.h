@@ -4,7 +4,9 @@
 #include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 
-class platform : public texture_functions
+#include <collision.h>
+
+class platform : public texture_functions , public collision
 {
 private:
     //Texture vector
@@ -12,7 +14,6 @@ private:
 
     //Sprite vector
     std::vector <sf::Sprite> sprites_;
-
 
     //functions
     void download_textures();
@@ -25,6 +26,7 @@ public:
 
     //public functions
     void render(sf::RenderWindow &window);
+    std::vector <sf::Sprite> return_sprites();
 
 };
 

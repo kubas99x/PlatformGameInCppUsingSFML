@@ -5,6 +5,8 @@ platform::platform()
     this->download_textures ();
     this->download_sprites ();
     this->set_sprites ();
+    this->collision_take_platforms (sprites_);
+
 
 }
 
@@ -21,9 +23,21 @@ void platform::render(sf::RenderWindow &window)
     }
 }
 
+std::vector<sf::Sprite> platform::return_sprites()
+{
+     return sprites_;
+}
+
 void platform::download_textures()
 {
     this->textures_.emplace_back(this->get_textures ("textures/platforms.png"));
+    this->textures_[0].setRepeated (true);
+
+    sf::Texture tmp;
+    tmp.loadFromFile ("textures/platforms.png", sf::IntRect(320 , 15, 175, 65));        //tekstura samej  trawy z ziemia by mozna powielac
+    this->textures_.emplace_back(tmp);
+    this->textures_[1].setRepeated (true);
+
 }
 
 void platform::download_sprites()
@@ -31,11 +45,13 @@ void platform::download_sprites()
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
+    this->sprites_.emplace_back(get_sprites(this->textures_[1]));       //ziemia
 
 }
 
 void platform::set_sprites()
 {
+    sf::Sprite test;
     sprites_[0].setTextureRect (sf::IntRect(18, 27 , 253 , 35));
     sprites_[0].setPosition (720,700);
     sprites_[0].setScale (0.5, 1);
@@ -46,6 +62,11 @@ void platform::set_sprites()
     sprites_[2].setPosition (1140,540);
     sprites_[2].setScale (0.5, 1);
 
-
+    //ziemia
+    sprites_[3].setTextureRect (sf::IntRect(320, 15 , 710 , 50));
+    sprites_[3].setPosition (0,817);
+    sprites_[3].setScale (1, 1);
 
 }
+
+
