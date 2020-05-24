@@ -27,12 +27,6 @@ void player::init_variables()
 
 }
 
-void player::kolizje()
-{
-    std::vector <sf::Sprite> platformy = return_platforms ();
-    std::cout<<"WHAAAAT:  "<<platformy.size()<<std::endl;
-}
-
 void player::download_textures()
 {
     this->textures_.emplace_back(this->get_textures ("textures/standing.png"));     //standing texture
@@ -115,11 +109,10 @@ void player::hero_check_moves()
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        //bool what=this->check_standing_collision (this->hero_);         //just for a moment
+        bool what=this->check_standing_collision (this->hero_);         //just for a moment
         hero_.move (0,velocity_x_*time_.asSeconds ());
         this->hero_action_=hero_action::walking;
         any=true;
-        kolizje ();
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))                    //Chwilowe 2 petle by latwiej sprawdzac kolizje
     {
@@ -178,6 +171,11 @@ void player::update_hero()
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
 
 
+}
+
+sf::Sprite player::hero_return()
+{
+    return hero_;
 }
 
 void player::render(sf::RenderWindow &window)

@@ -5,8 +5,6 @@ platform::platform()
     this->download_textures ();
     this->download_sprites ();
     this->set_sprites ();
-    this->collision_take_platforms (sprites_);
-
 
 }
 

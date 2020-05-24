@@ -31,9 +31,11 @@ private:
 
     //Private void functions
     void initWindow();
+    void initVariables();
 
     // collision;
     std::vector <sf::Sprite>  platforms_collisions_;
+    void game_take_platforms(const std::vector <sf::Sprite> &platforms);
 
 
 
@@ -46,6 +48,8 @@ public:
     void updatePollEvents();
     void update();
     void gamerender();
+
+    std::vector <sf::Sprite> game_return_platforms();
 
 
     //Bool functions

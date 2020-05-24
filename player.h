@@ -12,14 +12,13 @@ enum class hero_action
         walking,
         jumping
     };
+
 class player : public texture_functions, public collision
 {
 private:
     //Time
     sf::Clock clock;
     sf::Time time_;
-
-    //std::vector <sf::Sprite> *wsk = &collision::platforms_collisions_;
 
     //Texture vector
     std::vector <sf::Texture> textures_;
@@ -32,8 +31,6 @@ private:
     void download_textures();
     void set_hero_sprites();
     void init_variables();
-
-    void kolizje();
 
     //hero functions
     void set_hero();
@@ -70,6 +67,7 @@ public:
     //public functions
     void render(sf::RenderWindow &window);
     void update_hero();
+    sf::Sprite hero_return();
 };
 
 #endif // PLAYER_H

@@ -10,6 +10,13 @@ collision::~collision()
 
 }
 
+void collision::copy_platforms(const std::vector <sf::Sprite> &vector)
+{
+    platforms_collisions_= vector;
+    std::cout<<"COPY PLATFORMS"<<std::endl;
+}
+
+
 void collision::collision_take_platforms(const std::vector <sf::Sprite> &platforms)
 {
 
@@ -21,8 +28,9 @@ void collision::collision_take_platforms(const std::vector <sf::Sprite> &platfor
 
 bool collision::check_standing_collision(const sf::Sprite &hero)
 {
-    std::cout<<collision::platforms_collisions_.size ()<<std::endl;
-
+    std::cout<<"tutaj"<<std::endl;
+    std::cout<<platforms_collisions_wsk_->size()<<std::endl;
+    std::cout<<"a tutaj nie"<<std::endl;
     sf::Sprite guy = hero;
     guy.setOrigin (guy.getGlobalBounds ().width/2, guy.getGlobalBounds ().height/2);
     sf::Vector2f guy_possition =  guy.getPosition ();
@@ -50,6 +58,14 @@ bool collision::check_standing_collision(const sf::Sprite &hero)
     }
     return false;
 
+}
+
+void collision::init_wsk(const std::vector<sf::Sprite> &platforms)
+{
+    std::cout<<"tu sie wywala?"<<std::endl;
+    this->platforms_collisions_wsk_ = &platforms;
+    std::cout<<platforms_collisions_wsk_->size ()<<std::endl;
+    std::cout<<"tu sie wywala????"<<std::endl;
 }
 
 std::vector<sf::Sprite> collision::return_platforms()
