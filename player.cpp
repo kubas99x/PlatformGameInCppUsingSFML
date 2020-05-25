@@ -1,5 +1,6 @@
 #include "player.h"
 #include <iostream>
+
 player::player()
 {
     this->download_textures ();
@@ -18,7 +19,7 @@ void player::init_variables()
     this->hero_step_int_walking_=0;
     this->velocity_x_=150;
     this->velocity_y_=0;
-    this->gravity_=10;
+    this->gravity_=5;
     this->hero_animation_change_=false;
     this->walking_=false;
     this->hero_in_air_=true;
@@ -39,12 +40,12 @@ void player::set_hero_sprites()
     //standing animations
     for(int i=60; i<170*16; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
     {
-        standing_animations.emplace_back(sf::IntRect(i,40,40,45));
+        standing_animations.emplace_back(sf::IntRect(i,40,40,36));
     }
     //walking animations
     for(int i=60; i<170*8; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
     {
-        walking_animations.emplace_back(sf::IntRect(i,40,45,45));
+        walking_animations.emplace_back(sf::IntRect(i,40,45,36));
     }
 
 }
@@ -54,7 +55,7 @@ void player::set_hero()
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (100,300);
+    this->hero_.setPosition (750,500);
 }
 
 void player::update_hero_step_int()
@@ -107,9 +108,8 @@ void player::hero_check_moves()
 {
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !this->check_standing_collision (this->hero_ , velocity_x_*time_.asSeconds ()))
     {
-        bool what=this->check_standing_collision (this->hero_);         //just for a moment
         hero_.move (0,velocity_x_*time_.asSeconds ());
         this->hero_action_=hero_action::walking;
         any=true;
@@ -127,7 +127,7 @@ void player::hero_check_moves()
         this->hero_action_=hero_action::walking;
         any=true;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !this->check_walking_collision (this->hero_, velocity_x_*time_.asSeconds ()))
     {
         hero_.move (velocity_x_*time_.asSeconds (),0);
         this->hero_action_=hero_action::walking;
@@ -143,9 +143,8 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
     //zrob ta funkcje jak juz zrobisz kolizje
-    if(!this->check_standing_collision (hero_))                  //sprawdzamy czy bohater stoi na platformie
+    if(!this->check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
     {
-        std::cout<<"no chyba bajgla"<<std::endl;
         if(velocity_y_<10)
         {
         this->velocity_y_+=gravity_*time_.asSeconds ();
@@ -162,7 +161,7 @@ void player::update_hero()
 {
     this->time_ = clock.restart();              //restartuje zegar
 
-    //this->hero_gravity_move ();                 //sprawdza czy bohater znajduje sie w powietrzu
+    this->hero_gravity_move ();                 //sprawdza czy bohater znajduje sie w powietrzu
 
     this->update_hero_step_int ();              //zwieksza numer wybieranej klatki
 
@@ -171,11 +170,6 @@ void player::update_hero()
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
 
 
-}
-
-sf::Sprite player::hero_return()
-{
-    return hero_;
 }
 
 void player::render(sf::RenderWindow &window)

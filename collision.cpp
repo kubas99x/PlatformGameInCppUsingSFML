@@ -13,66 +13,82 @@ collision::~collision()
 void collision::copy_platforms(const std::vector <sf::Sprite> &vector)
 {
     platforms_collisions_= vector;
-    std::cout<<"COPY PLATFORMS"<<std::endl;
-}
-
-
-void collision::collision_take_platforms(const std::vector <sf::Sprite> &platforms)
-{
-
-    collision::platforms_collisions_=platforms;
-
-    std::cout<<platforms_collisions_.size()<<std::endl;
-    std::cout<<collision::platforms_collisions_.size()<<std::endl;
-}
-
-bool collision::check_standing_collision(const sf::Sprite &hero)
-{
-    std::cout<<"tutaj"<<std::endl;
-    std::cout<<platforms_collisions_wsk_->size()<<std::endl;
-    std::cout<<"a tutaj nie"<<std::endl;
-    sf::Sprite guy = hero;
-    guy.setOrigin (guy.getGlobalBounds ().width/2, guy.getGlobalBounds ().height/2);
-    sf::Vector2f guy_possition =  guy.getPosition ();
-    sf::FloatRect guy_dimension = guy.getGlobalBounds ();
-
-    for(auto &el : this->platforms_collisions_)
-    {
-        el.setOrigin (el.getGlobalBounds ().width/2, el.getGlobalBounds ().height/2);
-        sf::Vector2f platform_possition =  el.getPosition ();
-        sf::FloatRect platform_dimension = el.getGlobalBounds ();
-
-        float delta_x = platform_possition.x - guy_possition.x;
-        float delta_y = platform_possition.y - guy_possition.y;
-
-        float intersect_x = delta_x - (guy_dimension.width + platform_dimension.width) ;
-        float intersect_y = delta_y - (guy_dimension.height + platform_dimension.height);
-
-        std::cout<<"Intersect x:  "<<intersect_x<<"  intersect y:  "<<intersect_y <<std::endl;
-
-        if(intersect_x < 0.0f && intersect_y < 0.0f )
-        {
-            return true;
-            break;
-        }
-    }
-    return false;
-
+    std::cout<<"COPY PLATFORMS:  "<<platforms_collisions_.size()<<std::endl;
 }
 
 void collision::init_wsk(const std::vector<sf::Sprite> &platforms)
 {
-    std::cout<<"tu sie wywala?"<<std::endl;
-    this->platforms_collisions_wsk_ = &platforms;
-    std::cout<<platforms_collisions_wsk_->size ()<<std::endl;
-    std::cout<<"tu sie wywala????"<<std::endl;
+    //nie dziala jak na razie ze wskaznikami, wskaznik na wektor dla platformy jest pusty
+    platforms_collisions_wsk_ = &platforms;
 }
 
-std::vector<sf::Sprite> collision::return_platforms()
+bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &next_move)
 {
-    return platforms_collisions_;
+    sf::Sprite guy = hero;
+    float guy_width = guy.getGlobalBounds ().width/2.0f ;
+    float guy_height = guy.getGlobalBounds ().height/2.0f;
+    float guy_position_x = guy.getPosition ().x + guy_width;
+    float guy_position_y = guy.getPosition ().y + guy_height + next_move;
+
+    //juz dla wszystkich platform
+//    std::cout<<"#############################"<<std::endl;
+//    std::cout<<guy_position_y<<"   "<<guy_height<<std::endl;
+
+    for(auto &el : this->platforms_collisions_)
+    {
+            float el_width = el.getGlobalBounds ().width/2.0f;
+            float el_height = el.getGlobalBounds ().height/2.0f ;
+            float el_position_x = el.getPosition ().x + el_width;
+            float el_position_y = el.getPosition ().y + el_height + 5;          //+5 by ladnie stal na platformie
+
+            float delta_x = el_position_x - guy_position_x;
+            float delta_y = el_position_y - guy_position_y;
+
+            float intersect_x = std::abs(delta_x) - (guy_width + el_width) ;
+            float intersect_y = std::abs(delta_y) - (guy_height + el_height);
+//            std::cout<< el_position_y<<"    "<<el_height<<std::endl;
+//            std::cout<<"Intersect x:  "<<intersect_x<<"  intersect y:  "<<intersect_y <<std::endl;
+
+            if(intersect_x < 0.0f && intersect_y < 0.0f )
+            {
+                return true;
+
+            }
+    }
+                return false;
+
 }
 
+bool collision::check_walking_collision(const sf::Sprite &hero , const float &next_move)
+{
+    sf::Sprite guy = hero;
+    float guy_width = guy.getGlobalBounds ().width/2.0f;
+    float guy_height = guy.getGlobalBounds ().height/2.0f;
+    float guy_position_x = guy.getPosition ().x + guy_width  + next_move;
+    float guy_position_y = guy.getPosition ().y + guy_height - 1 ;      // -1 bo czasami wartosc intersect_y jest na poziomie ujemnych czesci tysiecznych
 
+//    std::cout<<"##########################################"<<std::endl;
+    for(auto &el : this->platforms_collisions_)
+    {
+            float el_width = el.getGlobalBounds ().width/2.0f;
+            float el_height = el.getGlobalBounds ().height/2.0f ;
+            float el_position_x = el.getPosition ().x + el_width;
+            float el_position_y = el.getPosition ().y + el_height + 5;      //+5 by ladnie stal na platformie
 
+            float delta_x = el_position_x - guy_position_x;
+            float delta_y = el_position_y - guy_position_y;
 
+            float intersect_x = std::abs(delta_x) - (guy_width + el_width);
+            float intersect_y = std::abs(delta_y) - (guy_height + el_height);
+//            std::cout<<"El width:  "<<el_width<<"  position  "<<el_position_x <<std::endl;
+//            std::cout<<"Intersect x:  "<<intersect_x<<"  intersect y:  "<<intersect_y <<std::endl;
+
+            if(intersect_x < 0.0f && intersect_y < 0.0f )
+            {
+                return true;
+
+            }
+    }
+                return false;
+
+}

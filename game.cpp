@@ -6,7 +6,7 @@ Game::Game()
     this->background_ = new background;
     this->platform_ = new platform;
     this->player_ = new player;
-    this->collision_ = new collision;
+    this->collision_ = new collision();
 
     this->initVariables();
 
@@ -26,13 +26,9 @@ void Game::initWindow()
 
 void Game::initVariables()
 {
-    this->game_take_platforms (this->platform_->return_sprites ());
+    //this->player_->init_wsk (this->platform_->return_sprites ());             //jak na razie na wskaznikach nie da rady
 
-    this->collision_->init_wsk (this->game_return_platforms ());
-
-    //this->collision_->copy_platforms (this->game_return_platforms ());
-
-    //this->collision_->copy_hero (this->player_->hero_return ());
+    this->player_->copy_platforms (this->platform_->return_sprites ());
 
 }
 
@@ -59,8 +55,6 @@ void Game::update()
 
     this->updatePollEvents();
 
-    //this->platform_->collision_take_platforms (platform_->return_sprites ());       //funkcja ktora wysyla do klasy collision platformy
-
     this->player_->update_hero();
 
 }
@@ -78,21 +72,8 @@ void Game::gamerender()
     this->window->display();
 }
 
-std::vector<sf::Sprite> Game::game_return_platforms()
-{
-    return platforms_collisions_;
-}
-
-
 bool Game::game_is_running() const
 {
     return this->window->isOpen ();
 }
 
-void Game::game_take_platforms(const std::vector <sf::Sprite> &platforms)
-{
-
-    platforms_collisions_=platforms;
-    std::cout<<"GAME platforms wektor size:  "<<platforms_collisions_.size()<<std::endl;
-
-}

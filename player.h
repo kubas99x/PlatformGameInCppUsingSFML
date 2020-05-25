@@ -67,7 +67,6 @@ public:
     //public functions
     void render(sf::RenderWindow &window);
     void update_hero();
-    sf::Sprite hero_return();
 };
 
 #endif // PLAYER_H

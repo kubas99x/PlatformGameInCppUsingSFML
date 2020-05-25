@@ -18,13 +18,10 @@ public:
     //now with GAME class
     void copy_platforms(const std::vector <sf::Sprite> &vector);
 
-    //function to take platforms (placed in game.cpp)
-    void collision_take_platforms(const std::vector <sf::Sprite> &platforms);
-    bool check_standing_collision(const sf::Sprite &hero);
-
+    //check collision functions
+    bool check_standing_collision(const sf::Sprite &hero,  const float &next_move);
+    bool check_walking_collision(const sf::Sprite &hero, const float &next_move);
     void init_wsk(const std::vector <sf::Sprite> &platforms);
-
-    std::vector <sf::Sprite> return_platforms();
 
 
 };
