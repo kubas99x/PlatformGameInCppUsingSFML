@@ -25,7 +25,7 @@ void collision::init_wsk(const std::vector<sf::Sprite> &platforms)
 bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &next_move)
 {
     sf::Sprite guy = hero;
-    float guy_width = guy.getGlobalBounds ().width/2.0f ;
+    float guy_width = guy.getGlobalBounds ().width/2.0f - 15 ;              //-15 by zwezyc to brane pole bohatera, by nie lapalo miecza
     float guy_height = guy.getGlobalBounds ().height/2.0f;
     float guy_position_x = guy.getPosition ().x + guy_width;
     float guy_position_y = guy.getPosition ().y + guy_height + next_move;
@@ -36,7 +36,7 @@ bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &
 
     for(auto &el : this->platforms_collisions_)
     {
-            float el_width = el.getGlobalBounds ().width/2.0f;
+            float el_width = el.getGlobalBounds ().width/2.0f - 20;
             float el_height = el.getGlobalBounds ().height/2.0f ;
             float el_position_x = el.getPosition ().x + el_width;
             float el_position_y = el.getPosition ().y + el_height + 5;          //+5 by ladnie stal na platformie
@@ -62,7 +62,7 @@ bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &
 bool collision::check_walking_collision(const sf::Sprite &hero , const float &next_move)
 {
     sf::Sprite guy = hero;
-    float guy_width = guy.getGlobalBounds ().width/2.0f;
+    float guy_width = guy.getGlobalBounds ().width/2.0f - 20;
     float guy_height = guy.getGlobalBounds ().height/2.0f;
     float guy_position_x = guy.getPosition ().x + guy_width  + next_move;
     float guy_position_y = guy.getPosition ().y + guy_height - 1 ;      // -1 bo czasami wartosc intersect_y jest na poziomie ujemnych czesci tysiecznych

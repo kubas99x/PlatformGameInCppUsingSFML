@@ -14,7 +14,5 @@ int main()
         game.gamerender();
     }
 
-    //does it works?
-    //and now?
     return 0;
 }

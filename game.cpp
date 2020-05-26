@@ -30,6 +30,8 @@ void Game::initVariables()
 
     this->player_->copy_platforms (this->platform_->return_sprites ());
 
+    //this->collision_->take_obiekty_player(this->player_);
+
 }
 
 void Game::updatePollEvents()

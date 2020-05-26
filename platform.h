@@ -4,9 +4,9 @@
 #include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 
-#include <collision.h>
 
-class platform : public texture_functions , public collision
+
+class platform : public texture_functions
 {
 private:
     //Texture vector

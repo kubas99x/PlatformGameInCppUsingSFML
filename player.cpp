@@ -147,7 +147,7 @@ void player::hero_gravity_move()
     {
         if(velocity_y_<10)
         {
-        this->velocity_y_+=gravity_*time_.asSeconds ();
+            this->velocity_y_+=gravity_*time_.asSeconds ();
         }
         this->hero_.move (0,velocity_y_);
     }

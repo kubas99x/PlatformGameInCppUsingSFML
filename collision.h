@@ -7,6 +7,9 @@
 class collision
 {
 private:
+    //wektor wskaznikow na platformy
+    std::vector <sf::Sprite*> vector_wsk_platforms;
+
 
     std::vector <sf::Sprite>  platforms_collisions_;
     const std::vector <sf::Sprite>  *platforms_collisions_wsk_ ;
