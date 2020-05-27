@@ -4,13 +4,16 @@
 #include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 
-
+#include "collision.h"
 
 class platform : public texture_functions
 {
 private:
     //Texture vector
     std::vector <sf::Texture> textures_;
+
+    //wsk
+    const collision * collision_;
 
     //Sprite vector
     std::vector <sf::Sprite> sprites_;
@@ -22,11 +25,13 @@ private:
 
 public:
     platform();
+    platform(collision *wsk);
     ~platform();
 
     //public functions
     void render(sf::RenderWindow &window);
     std::vector <sf::Sprite> return_sprites();
+    void set_wsk_collision(collision *wsk);
 
 };
 

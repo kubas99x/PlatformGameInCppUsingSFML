@@ -7,24 +7,29 @@
 class collision
 {
 private:
-    //wektor wskaznikow na platformy
-    std::vector <sf::Sprite*> vector_wsk_platforms;
-
-
-    std::vector <sf::Sprite>  platforms_collisions_;
-    const std::vector <sf::Sprite>  *platforms_collisions_wsk_ ;
 
 public:
     collision();
     ~collision();
 
-    //now with GAME class
-    void copy_platforms(const std::vector <sf::Sprite> &vector);
+    //wskaznik na wektor platform
+    const std::vector <sf::Sprite> *vector_wsk_platforms_ = nullptr;
+
+    //wskaznik na bohatera
+    const sf::Sprite *wsk_hero_collision_ = nullptr ;
+
+    //functions to set wsk
+    void set_wsk_on_platforms(const std::vector <sf::Sprite> &vector);
+    void set_wsk_on_hero(const sf::Sprite &hero);
 
     //check collision functions
     bool check_standing_collision(const sf::Sprite &hero,  const float &next_move);
     bool check_walking_collision(const sf::Sprite &hero, const float &next_move);
-    void init_wsk(const std::vector <sf::Sprite> &platforms);
+
+    //new functions na wskaznikach
+    bool check_standing_collision(const float &next_move) const;
+    bool check_walking_collision( const float &next_move) const;
+    sf::Sprite *return_hero_collision();
 
 
 };

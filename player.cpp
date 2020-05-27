@@ -7,6 +7,16 @@ player::player()
     this->set_hero_sprites ();
     this->set_hero ();
     this->init_variables ();
+    this->collision_ = nullptr;
+}
+
+player::player(collision *wsk)
+{
+    this->collision_ = wsk;
+    this->download_textures ();
+    this->set_hero_sprites ();
+    this->set_hero ();
+    this->init_variables ();
 }
 player::~player()
 {
@@ -108,7 +118,8 @@ void player::hero_check_moves()
 {
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !this->check_standing_collision (this->hero_ , velocity_x_*time_.asSeconds ()))
+    std::cout<<"jaka wartosc:  "<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;                //tu juz pokazuje wartosci z dupy
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !collision_->check_standing_collision (velocity_x_*time_.asSeconds ()))
     {
         hero_.move (0,velocity_x_*time_.asSeconds ());
         this->hero_action_=hero_action::walking;
@@ -127,7 +138,7 @@ void player::hero_check_moves()
         this->hero_action_=hero_action::walking;
         any=true;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !this->check_walking_collision (this->hero_, velocity_x_*time_.asSeconds ()))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !collision_->check_walking_collision (velocity_x_*time_.asSeconds ()))
     {
         hero_.move (velocity_x_*time_.asSeconds (),0);
         this->hero_action_=hero_action::walking;
@@ -143,8 +154,10 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
     //zrob ta funkcje jak juz zrobisz kolizje
-    if(!this->check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
-    {
+//    if(!this->check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
+//    {
+        if(!this->collision_-> check_standing_collision (velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
+        {
         if(velocity_y_<10)
         {
             this->velocity_y_+=gravity_*time_.asSeconds ();
@@ -159,6 +172,7 @@ void player::hero_gravity_move()
 
 void player::update_hero()
 {
+
     this->time_ = clock.restart();              //restartuje zegar
 
     this->hero_gravity_move ();                 //sprawdza czy bohater znajduje sie w powietrzu
@@ -170,6 +184,17 @@ void player::update_hero()
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
 
 
+}
+
+sf::Sprite player::return_hero()
+{
+    return hero_;
+}
+
+void player::set_wsk_collision(collision *wsk)
+{
+    collision_ = wsk;
+    //std::cout<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;
 }
 
 void player::render(sf::RenderWindow &window)

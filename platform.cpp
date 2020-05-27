@@ -1,7 +1,17 @@
 #include "platform.h"
-
+#include <iostream>
 platform::platform()
 {
+    this->download_textures ();
+    this->download_sprites ();
+    this->set_sprites ();
+    this->collision_ = nullptr;
+
+}
+
+platform::platform(collision *wsk)
+{
+    this->collision_ = wsk;
     this->download_textures ();
     this->download_sprites ();
     this->set_sprites ();
@@ -24,6 +34,12 @@ void platform::render(sf::RenderWindow &window)
 std::vector<sf::Sprite> platform::return_sprites()
 {
      return sprites_;
+}
+
+void platform::set_wsk_collision(collision *wsk)
+{
+    this->collision_ = wsk;
+    //std::cout<<"w kolizjach:  "<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;
 }
 
 void platform::download_textures()
