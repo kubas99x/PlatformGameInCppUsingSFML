@@ -153,9 +153,7 @@ void player::hero_check_moves()
 
 void player::hero_gravity_move()
 {
-    //zrob ta funkcje jak juz zrobisz kolizje
-//    if(!this->check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
-//    {
+
         if(!this->collision_-> check_standing_collision (velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
         {
         if(velocity_y_<10)
