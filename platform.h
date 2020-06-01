@@ -13,7 +13,7 @@ private:
     std::vector <sf::Texture> textures_;
 
     //wsk
-    const collision * collision_;
+    collision * collision_;
 
     //Sprite vector
     std::vector <sf::Sprite> sprites_;
@@ -31,7 +31,6 @@ public:
     //public functions
     void render(sf::RenderWindow &window);
     std::vector <sf::Sprite> return_sprites();
-    void set_wsk_collision(collision *wsk);
 
 };
 

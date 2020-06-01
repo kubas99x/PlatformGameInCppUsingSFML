@@ -124,7 +124,7 @@ void player::hero_check_moves()
      {
          std::cout<<"Space realised (hold)"<<std::endl;
      }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !collision_->check_standing_collision (velocity_x_*time_.asSeconds ()))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !collision_->check_standing_collision (hero_, velocity_x_*time_.asSeconds ()))
     {
         hero_.move (0,velocity_x_*time_.asSeconds ());
         this->hero_action_=hero_action::walking;
@@ -137,13 +137,13 @@ void player::hero_check_moves()
         any=true;
     }
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)&& !collision_->check_standing_collision (-1*velocity_x_*time_.asSeconds ()))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)&& !collision_->check_walking_collision (hero_,-1*velocity_x_*time_.asSeconds ()))
     {
         hero_.move (-1*velocity_x_*time_.asSeconds (),0);
         this->hero_action_=hero_action::walking;
         any=true;
     }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !collision_->check_walking_collision (velocity_x_*time_.asSeconds ()))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !collision_->check_walking_collision (hero_,velocity_x_*time_.asSeconds ()))
     {
         hero_.move (velocity_x_*time_.asSeconds (),0);
         this->hero_action_=hero_action::walking;
@@ -159,7 +159,7 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
 
-    if(!this->collision_-> check_standing_collision (velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
+    if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
     {
         if(velocity_y_<10)
         {

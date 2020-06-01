@@ -21,7 +21,7 @@ private:
     sf::Time time_;
 
     //wsk
-    const collision * collision_;
+    collision * collision_;
 
     //Texture vector
     std::vector <sf::Texture> textures_;

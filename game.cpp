@@ -7,10 +7,6 @@ Game::Game()
     this->collision_ = new collision;
     this->platform_ = new platform(this->collision_);
     this->player_ = new player(this->collision_);
-//    this->platform_ = new platform;
-//    this->player_ = new player;
-
-
 
     this->initVariables();
 
@@ -31,17 +27,7 @@ void Game::initWindow()
 void Game::initVariables()
 {
 
-    //this->player_->copy_platforms (this->platform_->return_sprites ());
-
-    this->collision_->set_wsk_on_platforms (this->platform_->return_sprites ());
-
-    this->collision_->set_wsk_on_hero (this->player_->return_hero());
-
-    this->player_->set_wsk_collision (this->collision_);
-
-    this->platform_->set_wsk_collision (this->collision_);
-
-
+    this->collision_->copy_platforms (this->platform_->return_sprites ());
 
 }
 
@@ -65,16 +51,6 @@ void Game::updatePollEvents()
 
 void Game::update()
 {
-//    this->collision_->set_wsk_on_platforms (this->platform_->return_sprites ());
-
-//    this->collision_->set_wsk_on_hero (this->player_->return_hero());
-
-//    this->player_->set_wsk_collision (this->collision_);
-
-//    this->platform_->set_wsk_collision (this->collision_);
-   // auto e = collision_->wsk_hero_collision_->getPosition ();
-    //std::cout<<e.x<<std::endl;
-//    auto e = collision_->wsk_hero_collision_->getPosition ();
     this->clock_.restart ();
 
     this->updatePollEvents();

@@ -36,10 +36,6 @@ std::vector<sf::Sprite> platform::return_sprites()
      return sprites_;
 }
 
-void platform::set_wsk_collision(collision *wsk)
-{
-    this->collision_ = wsk;
-}
 
 void platform::download_textures()
 {
