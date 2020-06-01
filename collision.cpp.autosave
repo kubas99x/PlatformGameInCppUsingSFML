@@ -7,7 +7,12 @@ collision::collision()
 
 collision::~collision()
 {
+    
+}
 
+void collision::copy_platforms(const std::vector<sf::Sprite> &platforms)
+{
+    vector_collision_platforms = platforms;
 }
 
 

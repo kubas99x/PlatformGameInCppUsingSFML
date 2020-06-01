@@ -37,9 +37,9 @@ void Game::initVariables()
 
     this->collision_->set_wsk_on_hero (this->player_->return_hero());
 
-//    this->player_->set_wsk_collision (this->collision_);
+    this->player_->set_wsk_collision (this->collision_);
 
-//    this->platform_->set_wsk_collision (this->collision_);
+    this->platform_->set_wsk_collision (this->collision_);
 
 
 
@@ -59,6 +59,7 @@ void Game::updatePollEvents()
         {
             this->window->close();
         }
+
     }
 }
 
@@ -73,6 +74,7 @@ void Game::update()
 //    this->platform_->set_wsk_collision (this->collision_);
    // auto e = collision_->wsk_hero_collision_->getPosition ();
     //std::cout<<e.x<<std::endl;
+//    auto e = collision_->wsk_hero_collision_->getPosition ();
     this->clock_.restart ();
 
     this->updatePollEvents();

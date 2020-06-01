@@ -18,7 +18,11 @@ public:
     //wskaznik na bohatera
     const sf::Sprite *wsk_hero_collision_ = nullptr ;
 
-    //
+    //OD NOWA
+    std::vector <sf::Sprite> vector_collision_platforms;
+    
+    //functions
+    void copy_platforms(const std::vector <sf::Sprite> &platforms);
 
     //functions to set wsk
     void set_wsk_on_platforms(const std::vector <sf::Sprite> &vector);

@@ -97,6 +97,8 @@ void player::choose_hero_animation()
         this->hero_.setTextureRect (this->standing_animations[this->hero_step_int_standing_]);
 
 
+
+
     }
     if(this->hero_animation_change_ && this->hero_action_==hero_action::walking)               //walking
     {
@@ -118,7 +120,10 @@ void player::hero_check_moves()
 {
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
 
-    std::cout<<"jaka wartosc:  "<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;                //tu juz pokazuje wartosci z dupy
+     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+     {
+         std::cout<<"Space realised (hold)"<<std::endl;
+     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !collision_->check_standing_collision (velocity_x_*time_.asSeconds ()))
     {
         hero_.move (0,velocity_x_*time_.asSeconds ());
@@ -132,7 +137,7 @@ void player::hero_check_moves()
         any=true;
     }
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)&& !collision_->check_standing_collision (-1*velocity_x_*time_.asSeconds ()))
     {
         hero_.move (-1*velocity_x_*time_.asSeconds (),0);
         this->hero_action_=hero_action::walking;
@@ -154,8 +159,8 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
 
-        if(!this->collision_-> check_standing_collision (velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
-        {
+    if(!this->collision_-> check_standing_collision (velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
+    {
         if(velocity_y_<10)
         {
             this->velocity_y_+=gravity_*time_.asSeconds ();

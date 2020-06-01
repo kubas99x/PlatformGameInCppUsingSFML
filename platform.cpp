@@ -39,7 +39,6 @@ std::vector<sf::Sprite> platform::return_sprites()
 void platform::set_wsk_collision(collision *wsk)
 {
     this->collision_ = wsk;
-    //std::cout<<"w kolizjach:  "<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;
 }
 
 void platform::download_textures()
