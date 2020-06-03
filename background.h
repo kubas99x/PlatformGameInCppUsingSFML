@@ -23,8 +23,12 @@ public:
     background();
     ~background();
 
+    //hero x position
+    float hero_x_position_background_;
+
     //public functions
     void render(sf::RenderWindow &window);
+    void update_background(const float &pos_x);
 
 };
 

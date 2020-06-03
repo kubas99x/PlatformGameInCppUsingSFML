@@ -10,7 +10,8 @@ enum class hero_action
     {
         standing,
         walking,
-        jumping
+        jumping,
+        falling
     };
 
 class player : public texture_functions
@@ -29,6 +30,7 @@ private:
     //elements of sprites
     std::vector <sf::IntRect> standing_animations;
     std::vector <sf::IntRect> walking_animations;
+    std::vector <sf::IntRect> jumping_animations;
 
     //functions
     void download_textures();
@@ -41,24 +43,31 @@ private:
     void choose_hero_animation();
     void hero_check_moves();
     void hero_gravity_move();
+    void hero_jumping();
+
 
     //hero variables
     float hero_frame_time_;
     int hero_step_int_standing_;
     int hero_step_int_walking_;
-    float velocity_x_;
-    float velocity_y_;                  //to jest do zmiany, bo bohater bedzie skakal
+    int hero_step_int_jumping_;
 
     //Enum
     hero_action hero_action_;
 
     //Variables
     float gravity_;
+    float velocity_x_;
+    float velocity_y_;                  //to jest do zmiany, bo bohater bedzie skakal
+    float velocity_jumping_;
+    float jumping_time_;
 
     //bools
     bool hero_animation_change_;
     bool walking_;
     bool hero_in_air_;
+    bool can_jump_;
+    bool hero_jumping_;
 
 protected:
     //Hero sprite
@@ -71,6 +80,7 @@ public:
     //public functions
     void render(sf::RenderWindow &window);
     void update_hero();
+    float return_hero_x_position();
     sf::Sprite return_hero();
 
     void set_wsk_collision(collision *wsk);

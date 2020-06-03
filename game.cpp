@@ -26,9 +26,8 @@ void Game::initWindow()
 
 void Game::initVariables()
 {
-
     this->collision_->copy_platforms (this->platform_->return_sprites ());
-
+    this->hero_x_position_=0;
 }
 
 void Game::updatePollEvents()
@@ -54,6 +53,14 @@ void Game::update()
     this->clock_.restart ();
 
     this->updatePollEvents();
+
+    this->hero_x_position_=this->player_->return_hero_x_position ();
+
+    this->background_->update_background (hero_x_position_);
+
+    this->platform_->update_platforms (hero_x_position_);
+
+    this->collision_->copy_platforms (this->platform_->return_sprites ());
 
     this->player_->update_hero();
 

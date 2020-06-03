@@ -37,6 +37,8 @@ public:
     Game();
     ~Game();
 
+    //Public variables
+    float hero_x_position_;
 
     //Public functions
     void updatePollEvents();

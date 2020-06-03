@@ -14,15 +14,13 @@ public:
 
     //OD NOWA
     std::vector <sf::Sprite> vector_collision_platforms;
-
+    
     //functions
     void copy_platforms(const std::vector <sf::Sprite> &platforms);
 
     //check collision functions
-    bool check_standing_collision(const sf::Sprite &hero,  const float &next_move);
+    bool check_standing_collision(const sf::Sprite &hero,  const float &next_move, const sf::IntRect &animation);
     bool check_walking_collision(const sf::Sprite &hero, const float &next_move);
-
-
 
 
 };

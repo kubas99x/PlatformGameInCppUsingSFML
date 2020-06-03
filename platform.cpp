@@ -5,6 +5,7 @@ platform::platform()
     this->download_textures ();
     this->download_sprites ();
     this->set_sprites ();
+    this->save_start_position();
     this->collision_ = nullptr;
 
 }
@@ -15,6 +16,7 @@ platform::platform(collision *wsk)
     this->download_textures ();
     this->download_sprites ();
     this->set_sprites ();
+    this->save_start_position();
 
 }
 
@@ -28,6 +30,14 @@ void platform::render(sf::RenderWindow &window)
     for(const auto  &el : sprites_)
     {
         window.draw (el);
+    }
+}
+
+void platform::update_platforms(const float &pos_x)
+{
+    for(size_t i=0; i<sprites_.size(); i++)
+    {
+        sprites_[i].setPosition (start_position_[i].x - pos_x,start_position_[i].y);
     }
 }
 
@@ -77,6 +87,15 @@ void platform::set_sprites()
     sprites_[3].setScale (1, 1);
 
 
+
+}
+
+void platform::save_start_position()
+{
+    for(const auto &el : sprites_)
+    {
+        start_position_.emplace_back(el.getPosition ());
+    }
 
 }
 

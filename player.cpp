@@ -27,12 +27,17 @@ void player::init_variables()
 {
     this->hero_step_int_standing_=0;
     this->hero_step_int_walking_=0;
+    this->hero_step_int_jumping_=0;
     this->velocity_x_=150;
     this->velocity_y_=0;
     this->gravity_=5;
+    this->velocity_jumping_ = 150;
+    this->jumping_time_ = 0.25f;
     this->hero_animation_change_=false;
     this->walking_=false;
     this->hero_in_air_=true;
+    this->can_jump_ = true;
+    this->hero_jumping_ = false;
     this->hero_action_=hero_action::standing;
 
 
@@ -42,21 +47,44 @@ void player::download_textures()
 {
     this->textures_.emplace_back(this->get_textures ("textures/standing.png"));     //standing texture
     this->textures_.emplace_back(this->get_textures ("textures/walking.png"));
+    this->textures_.emplace_back(this->get_textures ("textures/jumping.png"));
 }
 
 void player::set_hero_sprites()
 {
 
     //standing animations
-    for(int i=60; i<170*16; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
+    for(int i=60; i<170*16; i+=170)
     {
         standing_animations.emplace_back(sf::IntRect(i,40,40,36));
     }
+
     //walking animations
-    for(int i=60; i<170*8; i+=170)                       //co 170pikseli wycinamy, 40 pikseli
+    for(int i=60; i<170*8; i+=170)
     {
         walking_animations.emplace_back(sf::IntRect(i,40,45,36));
     }
+
+    //jumping animations        (13 animacji) (od 7 zaczyna obrot)
+    for(int i=60; i<220*8; i+=220)
+    {
+        jumping_animations.emplace_back(sf::IntRect(i,40,60,36));
+    }
+    for(int i=1835; i<230*5 + 1835; i+=230)
+    {
+        jumping_animations.emplace_back(sf::IntRect(i,5,60,50));
+    }
+    jumping_animations.emplace_back(sf::IntRect(2990,15,60,50));
+    //falling textures
+//    for(int i=2990; i<230*3 + 2990; i+=230)
+//    {
+//        jumping_animations.emplace_back(sf::IntRect(i,15,60,50));
+//    }
+//    for(int i=3670; i<220*9 + 3670; i+=220)
+//    {
+//        jumping_animations.emplace_back(sf::IntRect(i,30,60,45));
+//    }
+
 
 }
 
@@ -65,7 +93,7 @@ void player::set_hero()
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (750,500);
+    this->hero_.setPosition (0,200);
 }
 
 void player::update_hero_step_int()
@@ -83,6 +111,13 @@ void player::update_hero_step_int()
         hero_frame_time_=0;
         hero_animation_change_=true;
     }
+    if(hero_frame_time_>=1.0f/15.0f && this->hero_action_==hero_action::jumping)
+    {
+        hero_step_int_jumping_++;
+        hero_frame_time_=0;
+        hero_animation_change_=true;
+    }
+
 
 }
 void player::choose_hero_animation()
@@ -95,11 +130,8 @@ void player::choose_hero_animation()
         }
         this->hero_.setTexture (this->textures_[0]);
         this->hero_.setTextureRect (this->standing_animations[this->hero_step_int_standing_]);
-
-
-
-
     }
+
     if(this->hero_animation_change_ && this->hero_action_==hero_action::walking)               //walking
     {
         this->hero_.setTexture (this->textures_[1]);
@@ -109,10 +141,25 @@ void player::choose_hero_animation()
             hero_step_int_walking_=0;
         }
     }
+
+    if(this->hero_animation_change_ && this->hero_action_==hero_action::jumping)               //walking
+    {
+        this->hero_.setTexture (this->textures_[2]);
+        //this->hero_.setTextureRect (this->jumping_animations[this->hero_step_int_jumping_]);
+        this->hero_.setTextureRect (this->jumping_animations[13]);
+        if(this->hero_step_int_jumping_>=jumping_animations.size ()-1)
+        {
+            hero_step_int_jumping_=0;
+        }
+    }
+//    if(this->hero_action_==hero_action::falling)               //walking
+//    {
+//        this->hero_.setTexture (this->textures_[2]);
+//        //this->hero_.setTextureRect (this->jumping_animations[this->hero_step_int_jumping_]);
+//        this->hero_.setTextureRect (this->jumping_animations[14]);
+//    }
+
     this->hero_animation_change_ = false;
-
-
-
 
 }
 
@@ -120,22 +167,22 @@ void player::hero_check_moves()
 {
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
 
-     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+     if((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && this->can_jump_) || this->hero_jumping_)
      {
-         std::cout<<"Space realised (hold)"<<std::endl;
+         this->can_jump_  = false;
+         this->hero_jumping_ = true;
+         if(velocity_jumping_>0)
+         {
+         hero_.move (0, -400*time_.asSeconds ());
+         velocity_jumping_-=1.5*gravity_;
+         }
+         else
+         {
+             hero_jumping_ = false;
+             hero_step_int_jumping_ = 0;
+             velocity_jumping_=150;
+         }
      }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && !collision_->check_standing_collision (hero_, velocity_x_*time_.asSeconds ()))
-    {
-        hero_.move (0,velocity_x_*time_.asSeconds ());
-        this->hero_action_=hero_action::walking;
-        any=true;
-    }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))                    //Chwilowe 2 petle by latwiej sprawdzac kolizje
-    {
-        hero_.move (0,-1*velocity_x_*time_.asSeconds ());
-        this->hero_action_=hero_action::walking;
-        any=true;
-    }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)&& !collision_->check_walking_collision (hero_,-1*velocity_x_*time_.asSeconds ()))
     {
@@ -149,7 +196,11 @@ void player::hero_check_moves()
         this->hero_action_=hero_action::walking;
         any=true;
     }
-    if(!any)
+    if(hero_jumping_)
+    {
+        hero_action_ = hero_action::jumping;
+    }
+    if(!any && !hero_jumping_)
     {
         this->hero_action_=hero_action::standing;
     }
@@ -159,7 +210,7 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
 
-    if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds () ))                  //sprawdzamy czy bohater stoi na platformie
+    if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), standing_animations[0] ) && !this->hero_jumping_)                  //sprawdzamy czy bohater stoi na platformie
     {
         if(velocity_y_<10)
         {
@@ -170,7 +221,13 @@ void player::hero_gravity_move()
     else
     {
         this->velocity_y_=0;
+        this->can_jump_ = true;
     }
+}
+
+float player::return_hero_x_position()
+{
+    return hero_.getPosition ().x;
 }
 
 void player::update_hero()
@@ -194,19 +251,13 @@ sf::Sprite player::return_hero()
     return hero_;
 }
 
-void player::set_wsk_collision(collision *wsk)
-{
-    collision_ = wsk;
-    //std::cout<<collision_->wsk_hero_collision_->getPosition ().x<<std::endl;
-}
-
 void player::render(sf::RenderWindow &window)
 {
     window.draw(hero_);
 }
 
 
-
+//zrob ta animacje skakania bo to jest dramat
 
 
 
