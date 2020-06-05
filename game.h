@@ -7,6 +7,7 @@
 #include "platform.h"
 #include "player.h"
 #include "collision.h"
+#include "enemies.h"
 
 class Game
 {
@@ -28,10 +29,14 @@ private:
     //Collision
     collision * collision_;
 
+    //enemies
+    enemies * enemies_;
+
 
     //Private void functions
     void initWindow();
     void initVariables();
+    void check_all_collisions();
 
 public:
     Game();

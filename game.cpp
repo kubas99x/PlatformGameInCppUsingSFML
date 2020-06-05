@@ -7,6 +7,7 @@ Game::Game()
     this->collision_ = new collision;
     this->platform_ = new platform(this->collision_);
     this->player_ = new player(this->collision_);
+    this->enemies_ = new enemies(this->collision_);
 
     this->initVariables();
 
@@ -14,7 +15,11 @@ Game::Game()
 
 Game::~Game()
 {
-
+    delete background_;
+    delete collision_;
+    delete platform_;
+    delete player_;
+    delete enemies_;
 }
 
 void Game::initWindow()
@@ -27,7 +32,22 @@ void Game::initWindow()
 void Game::initVariables()
 {
     this->collision_->copy_platforms (this->platform_->return_sprites ());
+    this->collision_->copy_enemies (this->enemies_->return_enemies ());
     this->hero_x_position_=0;
+}
+
+void Game::check_all_collisions()
+{
+    if(player_->hero_action_==hero_action::attack1)
+    {
+        for(auto &el : enemies_->return_enemies ())
+        {
+            if(collision_->check_fighting_collision (player_->return_hero (), el))
+            {
+                std::cout<<"NO DOSTAL SKURCZYBYK"<<std::endl;
+            }
+        }
+    }
 }
 
 void Game::updatePollEvents()
@@ -60,7 +80,13 @@ void Game::update()
 
     this->platform_->update_platforms (hero_x_position_);
 
+    this->enemies_->update_enemy (hero_x_position_);
+
+    this->check_all_collisions ();
+
     this->collision_->copy_platforms (this->platform_->return_sprites ());
+
+    this->collision_->copy_enemies (this->enemies_->return_enemies ());
 
     this->player_->update_hero();
 
@@ -75,6 +101,8 @@ void Game::gamerender()
     this->platform_->render (*this->window);
 
     this->player_->render (*this->window);
+
+    this->enemies_->render (*this->window);
 
     this->window->display();
 }

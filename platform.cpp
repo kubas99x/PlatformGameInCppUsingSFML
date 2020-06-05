@@ -65,6 +65,7 @@ void platform::download_sprites()
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
     this->sprites_.emplace_back(get_sprites(this->textures_[1]));       //ziemia
+    //this->sprites_.emplace_back(get_sprites(this->textures_[0]));     //testowa platforma
 
 }
 
@@ -86,7 +87,9 @@ void platform::set_sprites()
     sprites_[3].setPosition (0,817);
     sprites_[3].setScale (1, 1);
 
-
+//    sprites_[4].setTextureRect (sf::IntRect(20, 27 , 250 , 35));      //testowa platforma
+//    sprites_[4].setPosition (500,750);
+//    sprites_[4].setScale (1.5, 1);
 
 }
 
