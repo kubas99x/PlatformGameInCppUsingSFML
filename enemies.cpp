@@ -47,11 +47,13 @@ void enemies::set_enemies_sprites()
 
 void enemies::set_enemies()
 {
-    sf::Sprite enemy;
-    enemy.setTexture (textures_[0]);
-    enemy.setTextureRect (type_first_[0]);
-    enemy.setScale (3.5, 3.5);
-    enemy.setPosition (650, 700);
+    enemies_struct enemy;
+    enemy.enemy_sprite_.setTexture (textures_[0]);
+    enemy.enemy_sprite_.setTextureRect (type_first_[0]);
+    enemy.enemy_sprite_.setScale (3.5, 3.5);
+    enemy.enemy_sprite_.setPosition (650, 700);
+    enemy.hp_=100;
+    enemy.was_attacked_=false;
     enemies_.emplace_back(enemy);
 
 }
@@ -75,8 +77,8 @@ void enemies::choose_enemy_animation()
         {
             enemy_step_standing_=0;
         }
-        this->enemies_[0].setTexture (this->textures_[0]);
-        this->enemies_[0].setTextureRect (this->type_first_[this->enemy_step_standing_]);
+        this->enemies_[0].enemy_sprite_.setTexture (this->textures_[0]);
+        this->enemies_[0].enemy_sprite_.setTextureRect (this->type_first_[this->enemy_step_standing_]);
     }
 }
 
@@ -86,7 +88,7 @@ void enemies::enemy_move()
     {
         if(move_left)
         {
-        enemies_[0].move (-1,0);
+        enemies_[0].enemy_sprite_.move (-1,0);
         distance_-=1;
         start_position_[0].x-=1;                //potrzebne by przeciwnicy sie przesuwali wraz z mapa
         if(distance_<=0)
@@ -98,7 +100,7 @@ void enemies::enemy_move()
         }
         else
         {
-        enemies_[0].move (1,0);
+        enemies_[0].enemy_sprite_.move (1,0);
         distance_-=1;
         start_position_[0].x+=1;
         if(distance_<=0)
@@ -115,7 +117,7 @@ void enemies::save_start_position()
 {
     for(auto const &el : enemies_)
     {
-        start_position_.emplace_back(el.getPosition ());
+        start_position_.emplace_back(el.enemy_sprite_.getPosition ());
     }
 }
 
@@ -123,7 +125,19 @@ void enemies::update_enemy_position(const float pos_x)
 {
     for(size_t i = 0; i<enemies_.size() ; i++)
     {
-        enemies_[i].setPosition (start_position_[i].x - pos_x, enemies_[i].getPosition ().y);
+        enemies_[i].enemy_sprite_.setPosition (start_position_[i].x - pos_x, enemies_[i].enemy_sprite_.getPosition ().y);
+    }
+}
+
+void enemies::check_enemy_hp()
+{
+    //for(size_t i=0; i<enemies_.size() ; i++)
+    for(auto itr = enemies_.begin (); itr<enemies_.end (); itr++)
+    {
+        if(itr->hp_<=0)
+        {
+            enemies_.erase (itr);
+        }
     }
 }
 
@@ -136,9 +150,10 @@ void enemies::update_enemy(const float &pos_x)
     this->enemy_move();
     this->update_enemy_frame ();
     this->choose_enemy_animation ();
+    this->check_enemy_hp ();
 }
 
-std::vector <sf::Sprite> enemies::return_enemies()
+std::vector <enemies_struct > enemies::return_enemies()
 {
     return enemies_;
 }
@@ -147,7 +162,7 @@ void enemies::render(sf::RenderWindow &window)
 {
     for(const auto &el: enemies_)
     {
-        window.draw(el);
+        window.draw(el.enemy_sprite_);
     }
 }
 

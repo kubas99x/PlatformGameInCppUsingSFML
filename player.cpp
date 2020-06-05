@@ -334,14 +334,7 @@ void player::hero_check_fight()
 {
     if(hero_action_==hero_action::attack1)
     {
-        if(this->collision_->check_fighting_collision (hero_))
-        {
-            //std::cout<<"trafiles!"<<std::endl;
-        }
-        else
-        {
-            //std::cout<<"miss"<<std::endl;
-        }
+
     }
 }
 
@@ -363,7 +356,7 @@ void player::update_hero()
 
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
 
-    this->hero_check_fight ();
+    //this->hero_check_fight ();
 
 
 }

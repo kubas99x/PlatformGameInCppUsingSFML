@@ -6,6 +6,15 @@
 #include "SFML/Graphics.hpp"
 #include <vector>
 
+struct enemies_struct
+{
+public:
+    sf::Sprite enemy_sprite_;
+    float hp_;
+    bool was_attacked_;
+
+};
+
 class enemies : public texture_functions
 {
 private:
@@ -24,8 +33,7 @@ private:
     std::vector <sf::IntRect> type_second_;
     std::vector <sf::IntRect> type_third_;
 
-    //wektor wrogow
-    std::vector <sf::Sprite> enemies_;
+
 
     //vector with start positions
     std::vector <sf::Vector2f> start_position_;
@@ -48,6 +56,7 @@ private:
     void enemy_move();
     void save_start_position();
     void update_enemy_position(const float pos_x);
+    void check_enemy_hp();
 
 
 public:
@@ -55,10 +64,13 @@ public:
     ~enemies();
     enemies(collision *wsk);
 
+    //wektor wrogow
+    std::vector <enemies_struct> enemies_;
+
     //Public functions
     void render(sf::RenderWindow &window);
     void update_enemy(const float &pos_x);
-    std::vector <sf::Sprite> return_enemies();
+    std::vector <enemies_struct > return_enemies();
 };
 
 #endif // ENEMIES_H
