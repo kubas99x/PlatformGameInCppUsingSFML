@@ -7,8 +7,7 @@
 #include "platform.h"
 #include "player.h"
 #include "collision.h"
-#include "enemies.h"
-
+#include "new_enemies.h"
 class Game
 {
 private:
@@ -30,13 +29,15 @@ private:
     collision * collision_;
 
     //enemies
-    enemies * enemies_;
+    std::vector <new_enemies*>  enemies_vector_;
 
 
     //Private void functions
     void initWindow();
     void initVariables();
     void check_all_collisions();
+    void add_enemies();
+    void check_enemy_hp_();
 
 public:
     Game();

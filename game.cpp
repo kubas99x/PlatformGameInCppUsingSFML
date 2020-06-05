@@ -7,8 +7,7 @@ Game::Game()
     this->collision_ = new collision;
     this->platform_ = new platform(this->collision_);
     this->player_ = new player(this->collision_);
-    this->enemies_ = new enemies(this->collision_);
-
+    this->add_enemies ();
     this->initVariables();
 
 }
@@ -19,7 +18,24 @@ Game::~Game()
     delete collision_;
     delete platform_;
     delete player_;
-    delete enemies_;
+}
+
+void Game::add_enemies()
+{
+    //typ , pos_x , pos_y, dystans_chodzenia, czas ktory czeka w miejscu
+    enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 650, 700 , 250, 3 ));
+}
+
+void Game::check_enemy_hp_()
+{
+    //for(auto itr = enemies_vector_.begin(); itr<enemies_vector_.end() ; itr++)
+     for(size_t i=0; i<enemies_vector_.size (); i++)
+    {
+      if(enemies_vector_[i]->hp_<=0)
+      {
+          enemies_vector_.erase (enemies_vector_.begin ()+i);
+      }
+    }
 }
 
 void Game::initWindow()
@@ -39,26 +55,28 @@ void Game::check_all_collisions()
 {
     if(player_->hero_action_==hero_action::attack1)
     {
-        for(size_t i=0; i<enemies_->return_enemies ().size (); i++)
+        for(auto &el : enemies_vector_)
         {
-            if(!enemies_->enemies_[i].was_attacked_ && collision_->check_fighting_collision (player_->return_hero (), enemies_->enemies_[i].enemy_sprite_))
+            if(!el->was_attacked_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ()))
             {
-                std::cout<<enemies_->enemies_[i].hp_<<std::endl;
-                enemies_->enemies_[i].hp_-=50;
-                std::cout<<enemies_->enemies_[i].hp_<<std::endl;
-                enemies_->enemies_[i].was_attacked_ = true;
+                std::cout<<el->hp_<<std::endl;
+                el->hp_-=50;
+                std::cout<<el->hp_<<std::endl;
+                el->was_attacked_ = true;
             }
         }
     }
     else
     {
-        for(size_t i=0; i<enemies_->return_enemies ().size (); i++)
+        for(auto &el : enemies_vector_)
         {
-            enemies_->enemies_[i].was_attacked_=false;
+            el->was_attacked_=false;
         }
 
     }
 }
+
+
 
 void Game::updatePollEvents()
 {
@@ -90,13 +108,18 @@ void Game::update()
 
     this->platform_->update_platforms (hero_x_position_);
 
-    this->enemies_->update_enemy (hero_x_position_);
+    for(const auto &el : enemies_vector_)
+    {
+        el->update_enemy (hero_x_position_);
+    }
 
     this->check_all_collisions ();
 
     this->collision_->copy_platforms (this->platform_->return_sprites ());
 
     this->player_->update_hero();
+
+    this->check_enemy_hp_();
 
 }
 
@@ -110,7 +133,10 @@ void Game::gamerender()
 
     this->player_->render (*this->window);
 
-    this->enemies_->render (*this->window);
+    for(const auto &el : enemies_vector_)
+    {
+        el->render (*this->window);
+    }
 
     this->window->display();
 }

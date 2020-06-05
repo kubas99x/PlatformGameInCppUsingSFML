@@ -12,9 +12,9 @@ CONFIG(debug, debug|release){
 SOURCES += \
         background.cpp \
         collision.cpp \
-        enemies.cpp \
         game.cpp \
         main.cpp \
+        new_enemies.cpp \
         platform.cpp \
         player.cpp \
         texture_functions.cpp
@@ -22,8 +22,9 @@ SOURCES += \
 HEADERS += \
     background.h \
     collision.h \
-    enemies.h \
+    enum_classes.h \
     game.h \
+    new_enemies.h \
     platform.h \
     player.h \
     texture_functions.h

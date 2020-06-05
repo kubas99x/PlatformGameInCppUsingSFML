@@ -5,18 +5,8 @@
 #include <SFML/Graphics.hpp>
 
 #include <collision.h>
+#include "enum_classes.h"
 
-enum class hero_action
-    {
-        standing,
-        standing_left,
-        walking,
-        walking_left,
-        jumping,
-        falling,
-        attack1,
-        attack1_left,
-    };
 
 class player : public texture_functions
 {
