@@ -16,8 +16,6 @@ private:
     //enemy sprite
     sf::Sprite enemy_sprite_;
 
-
-
     //enemy type
     enemy_type enemy_type_;
 
@@ -33,8 +31,10 @@ private:
     //variables
     float enemy_frame_time_;//
     int enemy_step_standing_;//
+    int enemy_step_dying_;
     bool enemy_animation_change_;//
     bool move_left;
+
     float waiting_time_;    //             //czas przez ktory wrog stoi i czeka w miejscu
     float distance_;
     float start_position_x_;//
@@ -48,20 +48,21 @@ private:
     void download_textures();
     void set_animations();
     void set_enemy();
-    void update_enemy_position(const float &pos_x);
     void update_enemy_frame();
     void choose_enemy_animation();
     void move_enemy();
+    void check_hp();
+    void init_variables();
 
 public:
     //enemy variables
     float hp_;
-
+    bool dead_;
     bool was_attacked_;
     new_enemies();
-    new_enemies(const enemy_type &type,const float &pos_x, const float &pos_y , const float &distance, const float &time);
+    new_enemies(const enemy_type &type,float pos_x, float pos_y , float distance, float time);
     void render(sf::RenderWindow &window);
-    void update_enemy(const float &pos_x);
+    void update_enemy();
     sf::Sprite return_enemy_sprite();
 };
 

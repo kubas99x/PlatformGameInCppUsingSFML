@@ -15,7 +15,7 @@ SOURCES += \
         game.cpp \
         main.cpp \
         new_enemies.cpp \
-        platform.cpp \
+        new_platforms.cpp \
         player.cpp \
         texture_functions.cpp
 
@@ -25,6 +25,6 @@ HEADERS += \
     enum_classes.h \
     game.h \
     new_enemies.h \
-    platform.h \
+    new_platforms.h \
     player.h \
     texture_functions.h

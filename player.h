@@ -41,8 +41,6 @@ private:
     void hero_check_moves();
     void hero_gravity_move();
     void hero_jumping();
-    void hero_check_fight();
-
 
     //hero variables
     float hero_frame_time_;

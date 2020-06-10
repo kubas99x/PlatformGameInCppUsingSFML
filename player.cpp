@@ -29,7 +29,7 @@ void player::init_variables()
     this->hero_step_int_walking_=0;
     this->hero_step_int_jumping_=0;
     this->hero_step_int_attack1_=0;
-    this->velocity_x_=150;
+    this->velocity_x_=230;
     this->velocity_y_=0;
     this->gravity_=5;
     this->velocity_jumping_ = 150;
@@ -54,6 +54,14 @@ void player::download_textures()
     this->textures_.emplace_back(this->get_textures ("textures/attack1.png"));       //4     //attack 1
     this->textures_.emplace_back(this->get_textures ("textures/standing_left.png")); //5    //standing left
     this->textures_.emplace_back(this->get_textures ("textures/attack1_left.png"));  //6
+}
+
+void player::set_hero()
+{
+    this->hero_.setTexture (this->textures_[0]);
+    this->hero_.setTextureRect (standing_animations[0]);
+    this->hero_.setScale (2.5,2.5);
+    this->hero_.setPosition (0,200);
 }
 
 void player::set_hero_sprites()
@@ -105,13 +113,7 @@ void player::set_hero_sprites()
     }
 }
 
-void player::set_hero()
-{
-    this->hero_.setTexture (this->textures_[0]);
-    this->hero_.setTextureRect (standing_animations[0]);
-    this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (0,200);
-}
+
 
 void player::update_hero_step_int()
 {
@@ -230,9 +232,12 @@ void player::hero_check_moves()
     {
         this->can_jump_  = false;
         this->hero_jumping_ = true;
-        if(velocity_jumping_>0 )
+
+        if(velocity_jumping_>0 && !collision_->check_standing_collision (hero_,-400*time_.asSeconds (),standing_animations[0]))
         {
+
             hero_.move (0, -400*time_.asSeconds ());
+
             velocity_jumping_-=1.5*gravity_;
         }
         else
@@ -265,7 +270,7 @@ void player::hero_check_moves()
         }
         if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking || this->hero_action_==hero_action::attack1)
         {
-           this->hero_action_=hero_action::attack1;
+           this->hero_action_=hero_action::attack1;                 //warunek okreslajacy w ktora strone jest skierowany bohater
         }
         else if (this->hero_action_!=hero_action::attack1_left)
         {
@@ -330,14 +335,6 @@ void player::hero_gravity_move()
     }
 }
 
-void player::hero_check_fight()
-{
-    if(hero_action_==hero_action::attack1)
-    {
-
-    }
-}
-
 float player::return_hero_x_position()
 {
     return hero_.getPosition ().x;
@@ -355,9 +352,6 @@ void player::update_hero()
     this->hero_check_moves ();                  //sprawdza czy bohater sie rusza
 
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
-
-    //this->hero_check_fight ();
-
 
 }
 

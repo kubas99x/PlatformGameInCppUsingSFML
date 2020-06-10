@@ -16,7 +16,7 @@ public:
     std::vector <sf::Sprite> vector_collision_platforms_;
     
     //functions
-    void copy_platforms(const std::vector <sf::Sprite> &platforms);
+    void copy_platforms(const sf::Sprite &platform );
 
     //check collision functions
     bool check_standing_collision(const sf::Sprite &hero,  const float &next_move, const sf::IntRect &animation);

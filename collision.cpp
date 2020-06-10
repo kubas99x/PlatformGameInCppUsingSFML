@@ -10,9 +10,9 @@ collision::~collision()
 
 }
 
-void collision::copy_platforms(const std::vector<sf::Sprite> &platforms)
+void collision::copy_platforms(const sf::Sprite &platform)
 {
-    vector_collision_platforms_ = platforms;
+    vector_collision_platforms_.emplace_back(platform);
 }
 
 bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &next_move, const sf::IntRect &animation)

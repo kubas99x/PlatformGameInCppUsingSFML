@@ -27,4 +27,16 @@ enum class enemy_action
 
 };
 
+enum class platform_type
+{
+    grass,
+    wood,
+    rock,
+    rock_with_gras,
+    rock_pion,
+    grass_pocz,
+
+
+};
+
 #endif // ENUM_CLASSES_H

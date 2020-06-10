@@ -25,11 +25,6 @@ void background::render(sf::RenderWindow &window)
     }
 }
 
-void background::update_background(const float &pos_x)
-{
-    sprites_[0].setPosition (-1*pos_x,0);
-}
-
 void background::download_textures()
 {
     this->textures_.emplace_back(this->get_textures ("textures/scene1.png"));
