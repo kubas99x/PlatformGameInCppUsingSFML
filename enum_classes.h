@@ -11,6 +11,7 @@ enum class hero_action
         falling,
         attack1,
         attack1_left,
+        dying,
     };
 
 enum class enemy_type
@@ -22,8 +23,10 @@ enum class enemy_type
 enum class enemy_action
 {
     standing,
+    standing_left,
     walking,
     dying,
+    attack_left,
 
 };
 
@@ -35,6 +38,7 @@ enum class platform_type
     rock_with_gras,
     rock_pion,
     grass_pocz,
+    spikes,
 
 
 };

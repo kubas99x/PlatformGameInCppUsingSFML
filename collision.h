@@ -22,7 +22,8 @@ public:
     bool check_standing_collision(const sf::Sprite &hero,  const float &next_move, const sf::IntRect &animation);
     bool check_walking_collision(const sf::Sprite &hero, const float &next_move, const sf::IntRect &animation);
     bool check_fighting_collision (const sf::Sprite &hero , const sf::Sprite &enemy );
-
+    bool check_platform_damage_collision(const sf::Sprite &hero, const sf::Sprite &enemy,const sf::IntRect &animation);
+    bool is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy);
 };
 
 

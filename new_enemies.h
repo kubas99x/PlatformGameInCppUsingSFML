@@ -32,8 +32,11 @@ private:
     float enemy_frame_time_;//
     int enemy_step_standing_;//
     int enemy_step_dying_;
+    int enemy_step_attack_;
     bool enemy_animation_change_;//
     bool move_left;
+    bool moving_left_;                  //do ustalania animacji
+
 
     float waiting_time_;    //             //czas przez ktory wrog stoi i czeka w miejscu
     float distance_;
@@ -41,6 +44,7 @@ private:
     float start_position_y_;//
     float walk_distance_;
     float waiting_time_start_;
+    float waiting_for_attack_;
 
 
 
@@ -53,12 +57,18 @@ private:
     void move_enemy();
     void check_hp();
     void init_variables();
+    void attack_stuff();
 
 public:
     //enemy variables
     float hp_;
     bool dead_;
     bool was_attacked_;
+    bool attacking_;                //czy postac jest w trakcie ataku
+    bool can_attack_;               //czy postac moze juz zaatakowac
+    bool hited_hero_;
+    bool can_deal_dmg_;             //by zadawal dmg tylko kiedy jest animacja tego ataku zamachniecia
+
     new_enemies();
     new_enemies(const enemy_type &type,float pos_x, float pos_y , float distance, float time);
     void render(sf::RenderWindow &window);

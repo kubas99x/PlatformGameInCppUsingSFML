@@ -28,6 +28,7 @@ private:
     std::vector <sf::IntRect> jumping_animations;
     std::vector <sf::IntRect> attack1_animations;
     std::vector <sf::IntRect> attack1_animations_left;
+    std::vector <sf::IntRect> dying_animations;
 
     //functions
     void download_textures();
@@ -41,6 +42,7 @@ private:
     void hero_check_moves();
     void hero_gravity_move();
     void hero_jumping();
+    void check_hero_hp();
 
     //hero variables
     float hero_frame_time_;
@@ -48,6 +50,7 @@ private:
     int hero_step_int_walking_;
     int hero_step_int_jumping_;
     int hero_step_int_attack1_;
+    int hero_step_int_dying_;
 
 
 
@@ -56,7 +59,8 @@ private:
     float velocity_x_;
     float velocity_y_;                  //to jest do zmiany, bo bohater bedzie skakal
     float velocity_jumping_;
-    float jumping_time_;
+    float velocity_jumping_start_;
+
 
     //bools
     bool hero_animation_change_;
@@ -78,12 +82,15 @@ public:
 
     //Enum
     hero_action hero_action_;
+    float hp_;
 
     //public functions
     void render(sf::RenderWindow &window);
     void update_hero();
     float return_hero_x_position();
+    float return_hp();
     sf::Sprite return_hero();
+    sf::IntRect return_standing_animation();
 
     void set_wsk_collision(collision *wsk);
 };

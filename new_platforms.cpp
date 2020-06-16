@@ -18,11 +18,22 @@ new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_
     download_textures ();
     set_sprites (pos_x, pos_y, scale_x, scale_y);
 }
+new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_y, float arm_x, float arm_y, const platform_type &type, bool interaction )
+{
+
+    this->type_=type;
+    this->interaction_=interaction;
+    download_textures ();
+    set_sprites (pos_x, pos_y, scale_x, scale_y);
+    set_arm_interaction_ (arm_x,arm_y);
+}
 
 new_platform::~new_platform()
 {
 
 }
+
+
 
 void new_platform::download_textures ()
 {
@@ -71,6 +82,13 @@ void new_platform::download_textures ()
         texture_.setRepeated (false);
         break;
     }
+    case platform_type::spikes:
+    {
+        tmp.loadFromFile ("textures/Assets.png", sf::IntRect(79 , 148, 16, 12));
+        texture_=tmp;
+        texture_.setRepeated (true);
+        break;
+    }
     default:
     {
         std::cout<<"Cos poszlo nie tak"<<std::endl;
@@ -88,6 +106,10 @@ void new_platform::set_sprites(float pos_x, float pos_y, float scale_x, float sc
 
 void new_platform::set_sprites(float pos_x, float pos_y, float scale_x, float scale_y, float width, float height)
 {
+    if(type_==platform_type::spikes)
+    {
+        damage_platform=true;
+    }
     sprite_.setTexture (texture_);
     sprite_.setPosition (pos_x,pos_y);
     sprite_.setScale (scale_x,scale_y);
@@ -95,15 +117,65 @@ void new_platform::set_sprites(float pos_x, float pos_y, float scale_x, float sc
 
 }
 
+void new_platform::set_arm_interaction_(float x, float y)
+{
+    sf::Texture tmp;
+    tmp.loadFromFile ("textures/Assets.png", sf::IntRect(64 , 84, 33, 12));
+    texture_interaction_=tmp;
+    texture_interaction_.setRepeated (false);
+    sprite_interaction_.setTexture (texture_interaction_);
+    sprite_interaction_.setTextureRect (sf::IntRect(0,0,17,12));                    //wybranie dzwigni w lewo
+    sprite_interaction_.setPosition (x,y);
+    sprite_interaction_.setScale (3,3);
+
+}
+
+void new_platform::chagne_arm_interaction()
+{
+    changed_arm_=true;
+    sprite_interaction_.setTextureRect (sf::IntRect(17,0,17,12));                    //wybranie dzwigni w lewo
+
+}
+
+void new_platform::move_platform(float time)
+{
+    if(distance>0)
+    {
+    this->sprite_.move (-1*distance*time,0);
+    distance-=distance*time;
+    }
+}
+
+void new_platform::update_platform(float time)
+{
+    if(interaction_switched_)
+    {
+
+        if(!changed_arm_)
+        {
+        this->chagne_arm_interaction ();
+        }
+        this->move_platform (time);
+    }
+}
 void new_platform::render(sf::RenderWindow &window)
 {
 
     window.draw (sprite_);
+    if(this->interaction_)
+    {
+        window.draw (sprite_interaction_);
+    }
 
 }
 
 sf::Sprite new_platform::return_sprite()
 {
     return sprite_;
+}
+
+sf::Sprite new_platform::return_sprite_interaction()
+{
+    return sprite_interaction_;
 }
 
