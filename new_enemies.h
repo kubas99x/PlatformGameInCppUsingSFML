@@ -34,7 +34,6 @@ private:
     int enemy_step_dying_;
     int enemy_step_attack_;
     bool enemy_animation_change_;//
-    bool move_left;
     bool moving_left_;                  //do ustalania animacji
 
 
@@ -58,6 +57,7 @@ private:
     void check_hp();
     void init_variables();
     void attack_stuff();
+    void move_wolf();
 
 public:
     //enemy variables
@@ -68,11 +68,16 @@ public:
     bool can_attack_;               //czy postac moze juz zaatakowac
     bool hited_hero_;
     bool can_deal_dmg_;             //by zadawal dmg tylko kiedy jest animacja tego ataku zamachniecia
+    bool attack_right_;
+    bool wolf_running_;
+    bool move_left;
+
 
     new_enemies();
     new_enemies(const enemy_type &type,float pos_x, float pos_y , float distance, float time);
     void render(sf::RenderWindow &window);
     void update_enemy();
+    enemy_type return_enemy_type();
     sf::Sprite return_enemy_sprite();
 };
 

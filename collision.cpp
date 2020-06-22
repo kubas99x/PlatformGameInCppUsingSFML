@@ -30,7 +30,7 @@ bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &
         float el_width = el.getGlobalBounds ().width/2.0f - 20;
         float el_height = el.getGlobalBounds ().height/2.0f ;
         float el_position_x = el.getPosition ().x + el_width;
-        float el_position_y = el.getPosition ().y + el_height + 5;          //+5 by ladnie stal na platformie
+        float el_position_y = el.getPosition ().y + el_height + 15;          //+5 by ladnie stal na platformie
 
         float delta_x = el_position_x - guy_position_x;
         float delta_y = el_position_y - guy_position_y;
@@ -56,7 +56,7 @@ bool collision::check_walking_collision(const sf::Sprite &hero , const float &ne
     float guy_height = guy.getGlobalBounds ().height/2.0f  ;
     float guy_position_x = guy.getPosition ().x + guy_width  + next_move;
     float guy_position_y = guy.getPosition ().y + guy_height -1 ;      // -1 bo czasami wartosc intersect_y jest na poziomie ujemnych czesci tysiecznych
-    guy_height-=10;                                     //by bohater sie ladnie miescil pod platforma
+    guy_height-=40;                                     //by bohater sie ladnie miescil pod platforma
     guy_width-=30;
     if(guy.getPosition ().x + next_move <0)             //warunek by bohater nie mogl wypasc za mape
     {
@@ -100,6 +100,7 @@ bool collision::check_fighting_collision(const sf::Sprite &hero, const sf::Sprit
     float el_height = enemy.getGlobalBounds ().height/2.0f ;
     float el_position_x = enemy.getPosition ().x + el_width;
     float el_position_y = enemy.getPosition ().y + el_height;
+    el_height-=30;
 
     float delta_x = el_position_x - guy_position_x;
     float delta_y = el_position_y - guy_position_y;
@@ -148,7 +149,7 @@ bool collision::check_platform_damage_collision(const sf::Sprite &hero, const sf
     return false;
 }
 
-bool collision::is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy)
+bool collision::is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy, const enemy_type &enemy_type)
 {
     sf::Sprite guy = hero;
     float guy_width = guy.getGlobalBounds ().width/2.0f;
@@ -156,7 +157,15 @@ bool collision::is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy)
     float guy_position_x = guy.getPosition ().x + guy_width;
     float guy_position_y = guy.getPosition ().y + guy_height -1 ;      // -1 bo czasami wartosc intersect_y jest na poziomie ujemnych czesci tysiecznych
 
-    guy_width+=150;
+    if(enemy_type==enemy_type::skeleton)
+    {
+        guy_width+=150;
+    }
+    else if (enemy_type== enemy_type::wolf)
+    {
+        guy_width+=500;
+    }
+
 
     float el_width = enemy.getGlobalBounds ().width/2.0f;
     float el_height = enemy.getGlobalBounds ().height/2.0f ;

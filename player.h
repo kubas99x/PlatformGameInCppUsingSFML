@@ -15,6 +15,8 @@ private:
     sf::Clock clock;
     sf::Time time_;
 
+    sf::Vector2u window_size_;
+
     //wsk
     collision * collision_;
 
@@ -29,6 +31,9 @@ private:
     std::vector <sf::IntRect> attack1_animations;
     std::vector <sf::IntRect> attack1_animations_left;
     std::vector <sf::IntRect> dying_animations;
+    std::vector <sf::IntRect> spin_attack_animations;
+    std::vector <sf::IntRect> spin_attack_animations_left;
+
 
     //functions
     void download_textures();
@@ -71,7 +76,8 @@ private:
     bool attack1_;
     bool attack1_still_;
     bool was_walking_left_;
-
+    bool spin_attack_;
+    bool spin_attack_still_;
 protected:
     //Hero sprite
     sf::Sprite hero_;                       //bohater
@@ -87,6 +93,7 @@ public:
     //public functions
     void render(sf::RenderWindow &window);
     void update_hero();
+    void get_window_size(const sf::Vector2u &window_s);
     float return_hero_x_position();
     float return_hp();
     sf::Sprite return_hero();

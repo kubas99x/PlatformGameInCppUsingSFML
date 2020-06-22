@@ -12,11 +12,14 @@ enum class hero_action
         attack1,
         attack1_left,
         dying,
+        spin_attack,
+        spin_attack_left,
     };
 
 enum class enemy_type
     {
     skeleton,
+    wolf,
 
 };
 
@@ -26,6 +29,7 @@ enum class enemy_action
     standing_left,
     walking,
     dying,
+    attack,
     attack_left,
 
 };

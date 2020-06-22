@@ -29,9 +29,10 @@ Game::~Game()
 
 void Game::add_enemies()
 {
-    //typ , pos_x , pos_y, dystans_chodzenia, czas ktory czeka w miejscu
+    //typ , pos_x , pos_y, dystans_chodzenia, czas ktory czeka w miejscu (dla wilka czas po ktorym zaatakuje)
     enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 650, 700 , 250, 3 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 500, 700 , 200, 1 ));
+    enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 1800, 270 , 350, 2 ));
 
 }
 
@@ -61,7 +62,7 @@ void Game::add_platforms()
     platforms_vector_.emplace_back(new new_platform(2220,0,0.7,1,65,620,platform_type::rock_pion));
     platforms_vector_.emplace_back(new new_platform(1950,260,0.5,1,65,100,platform_type::rock_pion));
     platforms_vector_.emplace_back(new new_platform(1900,870,1,0.5,130,65,platform_type::rock));
-    platforms_vector_.emplace_back(new new_platform(2170,870,1,0.5,130,65,platform_type::rock));
+    platforms_vector_.emplace_back(new new_platform(2170,870,1,0.5,800,65,platform_type::rock));
 
 
     //spikes    //wyskosc 12 maja
@@ -76,6 +77,7 @@ void Game::initWindow()
     this->window->setFramerateLimit(60);
     this->window->setVerticalSyncEnabled(false);
     this->widok.setSize (1440,900);
+    this->window->setKeyRepeatEnabled(false);               //by wyrywalo klikniecie pojedyncze
 }
 
 void Game::initVariables()
@@ -85,19 +87,21 @@ void Game::initVariables()
     {
         collision_->copy_platforms (el->return_sprite ());
     }
+    this->player_->get_window_size (window->getSize ());
 }
 
 void Game::check_all_collisions()
 {
-    if(player_->hero_action_==hero_action::attack1 || player_->hero_action_==hero_action::attack1_left )
+
+    if(player_->hero_action_==hero_action::attack1 || player_->hero_action_==hero_action::attack1_left ||
+            player_->hero_action_==hero_action::spin_attack || player_->hero_action_==hero_action::spin_attack_left)
     {
         for(auto &el : enemies_vector_)
         {
             if(!el->was_attacked_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ()))
             {
-                std::cout<<el->hp_<<std::endl;
                 el->hp_-=50;
-                std::cout<<el->hp_<<std::endl;
+                std::cout<<"enemy hp:  "<<el->hp_<<std::endl;
                 el->was_attacked_ = true;
             }
         }
@@ -112,28 +116,68 @@ void Game::check_all_collisions()
     }
     for(auto &el : platforms_vector_)
     {
-        if(el->damage_platform && collision_->check_platform_damage_collision (player_->return_hero (), el->return_sprite (), player_->return_standing_animation ()))
+        if(player_->hero_action_!=hero_action::dying && el->damage_platform && collision_->check_platform_damage_collision (player_->return_hero (), el->return_sprite (), player_->return_standing_animation ()))
         {
                 player_->hp_-=50;
-                std::cout<<player_->hp_<<std::endl;
+                std::cout<<"player hp: "<<player_->hp_<<std::endl;
         }
     }
 
     //atakowanie przeciwnika
 
+    //wilk po wykryciu ruchu po danej stronie zaczyna tam biec, dopiero jak jest blisko to zaczyna atakowac
     for(auto &el : enemies_vector_)
     {
-        if(el->can_attack_ && collision_->is_player_near (player_->return_hero (), el->return_enemy_sprite ()))
+        if(el->can_attack_ && collision_->is_player_near (player_->return_hero (), el->return_enemy_sprite () , el->return_enemy_type ()))
         {
-            el->attacking_=true;
-            el->can_attack_=false;
+            if(player_->return_hero_x_position () < el->return_enemy_sprite ().getPosition ().x)
+            {
+                el->attack_right_=false;
+            }
+            else
+            {
+                el->attack_right_=true;
+            }
+
+            if(el->return_enemy_type () ==enemy_type::wolf)
+            {
+                //jezeli jeszcze by nie trafilo ugryzienie to biegnij dalej
+                if(!el->attacking_ && !collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ()))
+                {
+                    //el->attacking_=false;
+                    el->wolf_running_=true;
+                    if(player_->return_hero_x_position () < el->return_enemy_sprite ().getPosition ().x)
+                    {
+                        el->move_left=true;
+                    }
+                    else
+                    {
+                        el->move_left=false;
+                    }
+                }
+                else
+                {
+                    el->wolf_running_=false;
+                    el->attacking_=true;
+                }
+            }
+            else
+            {
+                el->attacking_=true;
+                el->can_attack_=false;
+            }
+
+        }
+        else if(el->return_enemy_type () ==enemy_type::wolf)
+        {
+            el->wolf_running_=false;
         }
         if(el->attacking_ && !el->hited_hero_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ())
                 && el->can_deal_dmg_)
         {
             el->hited_hero_ = true;
             player_->hp_-=50;
-            std::cout<<player_->hp_<<std::endl;
+            std::cout<<"player hp:"<<player_->hp_<<std::endl;
         }
     }
 
@@ -180,6 +224,12 @@ void Game::updatePollEvents()
                 }
             }
         }
+
+        //do robienie dodga
+//        if (e.Event::KeyReleased && e.Event::key.code == sf::Keyboard::Right )
+//        {
+//            std::cout<<"JEB JEB"<<std::endl;
+//        }
 
     }
 }
@@ -247,9 +297,6 @@ void Game::gamerender()
 
     this->player_->render (*this->window);
 
-
-
-
     this->window->display();
 }
 
@@ -258,4 +305,3 @@ bool Game::game_is_running() const
     return this->window->isOpen ();
 }
 
-//zmien funkcje kopiowania platform! bo jezeli robisz to co petle to tworzysz ich nieskonczonosc

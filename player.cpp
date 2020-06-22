@@ -43,7 +43,9 @@ void player::init_variables()
     this->hero_action_=hero_action::standing;
     this->attack1_ = true;
     this->attack1_still_ = false;
+    this->spin_attack_still_=false;
     this->was_walking_left_ = false;
+    this->spin_attack_ = true;
     this->hp_=100;
 }
 
@@ -56,7 +58,10 @@ void player::download_textures()
     this->textures_.emplace_back(this->get_textures ("textures/attack1.png"));       //4     //attack 1
     this->textures_.emplace_back(this->get_textures ("textures/standing_left.png")); //5    //standing left
     this->textures_.emplace_back(this->get_textures ("textures/attack1_left.png"));  //6
-    this->textures_.emplace_back(this->get_textures ("textures/death.png"));  //7
+    this->textures_.emplace_back(this->get_textures ("textures/death.png"));        //7
+    this->textures_.emplace_back(this->get_textures ("textures/spin_attack.png"));        //8
+    this->textures_.emplace_back(this->get_textures ("textures/spin_attack_left.png"));        //9
+
 }
 
 void player::set_hero()
@@ -64,7 +69,7 @@ void player::set_hero()
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (0,200);
+    this->hero_.setPosition (1500,200);
 }
 
 void player::set_hero_sprites()
@@ -73,28 +78,20 @@ void player::set_hero_sprites()
     //standing animations
     for(int i=60; i<170*16; i+=170)
     {
-        standing_animations.emplace_back(sf::IntRect(i,40,40,36));
+        standing_animations.emplace_back(sf::IntRect(i,25,40,55));
     }
     for(int i=70; i<170*16; i+=170)
     {
-        standing_animations_left.emplace_back(sf::IntRect(i,40,40,36));
+        standing_animations_left.emplace_back(sf::IntRect(i,25,40,55));
     }
     //walking animations
     for(int i=60; i<170*8; i+=170)
     {
-        walking_animations.emplace_back(sf::IntRect(i,40,45,36));
+        walking_animations.emplace_back(sf::IntRect(i,25,45,55));
     }
 
-    //jumping animations        (13 animacji) (od 7 zaczyna obrot)
-    for(int i=60; i<220*8; i+=220)
-    {
-        jumping_animations.emplace_back(sf::IntRect(i,40,60,36));
-    }
-    for(int i=1835; i<230*5 + 1835; i+=230)
-    {
-        jumping_animations.emplace_back(sf::IntRect(i,5,60,50));
-    }
-    jumping_animations.emplace_back(sf::IntRect(2990,15,60,50));
+    //jumping animations
+    jumping_animations.emplace_back(sf::IntRect(2990,15,60,55));
 
     //fighting animations
     for(int i=58; i<170*30+60; i+=170)
@@ -107,7 +104,33 @@ void player::set_hero_sprites()
     }
     for(int i=60; i<170*41; i+=170)
     {
-        dying_animations.emplace_back(sf::IntRect(i,40,60,36));      //wycinanie na 40 jak cos
+        dying_animations.emplace_back(sf::IntRect(i,25,60,55));
+    }
+    for(int i=60; i<170*30; i+=170)
+    {
+        if(i==2440)
+            i+=7;
+        if(i==3297)
+            i+=15;
+        if(i==3822)
+            i+=8;
+        spin_attack_animations.emplace_back(sf::IntRect(i,25,60,55));
+    }
+    for(int i=37; i<170*30; i+=170)
+    {
+        if(i==2417)
+            i+=7;
+        if(i==3274)
+            i+=15;
+        spin_attack_animations_left.emplace_back(sf::IntRect(i,25,60,55));
+        if(i==887)
+        {
+            i-=12;
+        }
+        if(i==1385)
+        {
+            i+=12;
+        }
     }
 }
 
@@ -128,13 +151,8 @@ void player::update_hero_step_int()
         hero_frame_time_=0;
         hero_animation_change_=true;
     }
-    if(hero_frame_time_>=1.0f/15.0f && this->hero_action_==hero_action::jumping)
-    {
-        hero_step_int_jumping_++;
-        hero_frame_time_=0;
-        hero_animation_change_=true;
-    }
-    if(hero_frame_time_>=1.0f/15.0f && (this->hero_action_==hero_action::attack1 || this->hero_action_==hero_action::attack1_left))
+    if(hero_frame_time_>=1.0f/15.0f && (this->hero_action_==hero_action::attack1 || this->hero_action_==hero_action::attack1_left ||
+                                        this->hero_action_==hero_action::spin_attack || this->hero_action_==hero_action::spin_attack_left))
     {
         hero_step_int_attack1_++;
         hero_frame_time_=0;
@@ -146,6 +164,12 @@ void player::update_hero_step_int()
         hero_frame_time_=0;
         hero_animation_change_=true;
     }
+    if(hero_action_==hero_action::jumping)
+    {
+        hero_frame_time_=0;
+        hero_animation_change_=true;
+    }
+
 
 
 }
@@ -189,15 +213,10 @@ void player::choose_hero_animation()
         }
     }
 
-    if(this->hero_animation_change_ && this->hero_action_==hero_action::jumping)               //walking
+    if(this->hero_animation_change_ && this->hero_action_==hero_action::jumping)
     {
         this->hero_.setTexture (this->textures_[2]);
-        //this->hero_.setTextureRect (this->jumping_animations[this->hero_step_int_jumping_]);
-        this->hero_.setTextureRect (this->jumping_animations[13]);
-        if(this->hero_step_int_jumping_>=jumping_animations.size ()-1)
-        {
-            hero_step_int_jumping_=0;
-        }
+        this->hero_.setTextureRect (this->jumping_animations[0]);
     }
 
     //fight animation
@@ -216,6 +235,24 @@ void player::choose_hero_animation()
         {
             this->hero_.setTexture (this->textures_[6]);
             this->hero_.setTextureRect (this->attack1_animations_left[attack1_animations.size ()-1-this->hero_step_int_attack1_]);
+        }
+    }
+    //spin attack
+    if(this->hero_animation_change_ && (this->hero_action_==hero_action::spin_attack || this->hero_action_==hero_action::spin_attack_left ))               //standing
+    {
+        if(this->hero_step_int_attack1_>=spin_attack_animations.size ()-1)
+        {
+            hero_step_int_attack1_=0;
+        }
+        if(this->hero_action_==hero_action::spin_attack)
+        {
+            this->hero_.setTexture (this->textures_[8]);
+            this->hero_.setTextureRect (this->spin_attack_animations[this->hero_step_int_attack1_]);
+        }
+        else
+        {
+            this->hero_.setTexture (this->textures_[9]);
+            this->hero_.setTextureRect (this->spin_attack_animations_left[attack1_animations.size ()-1-this->hero_step_int_attack1_]);
         }
     }
 
@@ -256,30 +293,33 @@ void player::hero_check_moves()
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)&& !collision_->check_walking_collision (hero_,-1*velocity_x_*time_.asSeconds (),walking_animations[0]))
     {
         hero_.move (-1*velocity_x_*time_.asSeconds (),0);
-        this->hero_action_=hero_action::walking_left;
+        if(!attack1_still_ && !spin_attack_still_)
+        {
+            this->hero_action_=hero_action::walking_left;
+
+        }
         any=true;
         was_walking_left_ = true;
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && !collision_->check_walking_collision (hero_,velocity_x_*time_.asSeconds (),walking_animations[0]))
     {
         hero_.move (velocity_x_*time_.asSeconds (),0);
-        this->hero_action_=hero_action::walking;
+        if(!attack1_still_ && !spin_attack_still_)
+        {
+            this->hero_action_=hero_action::walking;
+        }
         any=true;
         was_walking_left_=false;
     }
-    if((sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && attack1_) || attack1_still_)
+    if((sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && attack1_ && !spin_attack_still_) || attack1_still_ )
     {
-        if(attack1_)
+        if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking )
         {
-            hero_.move (0, -40);
+            this->hero_action_=hero_action::attack1;                 //warunek okreslajacy w ktora strone jest skierowany bohater
         }
-        if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking || this->hero_action_==hero_action::attack1)
+        else if (this->hero_action_!=hero_action::attack1)
         {
-           this->hero_action_=hero_action::attack1;                 //warunek okreslajacy w ktora strone jest skierowany bohater
-        }
-        else if (this->hero_action_!=hero_action::attack1_left)
-        {
-           this->hero_action_=hero_action::attack1_left;
+            this->hero_action_=hero_action::attack1_left;
         }
         any=true;
         attack1_=false;
@@ -289,24 +329,47 @@ void player::hero_check_moves()
             any=false;
             attack1_=true;
             attack1_still_=false;
-            hero_.move(0,40);
             hero_step_int_attack1_++;
         }
     }
-    if(hero_jumping_)
+
+    //Spin attack
+    if((sf::Keyboard::isKeyPressed(sf::Keyboard::X) && spin_attack_ && !attack1_still_) || spin_attack_still_ )
+    {
+
+        if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking )
+        {
+            this->hero_action_=hero_action::spin_attack;                 //warunek okreslajacy w ktora strone jest skierowany bohater
+        }
+        else if (this->hero_action_!=hero_action::spin_attack)
+        {
+            this->hero_action_=hero_action::spin_attack_left;
+        }
+        any=true;
+        spin_attack_=false;
+        spin_attack_still_=true;
+        if(hero_step_int_attack1_==spin_attack_animations.size()-1)
+        {
+            any=false;
+            spin_attack_=true;
+            spin_attack_still_=false;
+            hero_step_int_attack1_++;
+        }
+    }
+    if(hero_jumping_ && !attack1_still_ && !spin_attack_still_)
     {
         hero_action_ = hero_action::jumping;
     }
-    if(!any && !hero_jumping_ && !attack1_still_ )
+    if(!any && !hero_jumping_ && !attack1_still_  && !spin_attack_still_)
     {
         hero_animation_change_=true;
         if(!was_walking_left_)
         {
-        this->hero_action_=hero_action::standing;
+            this->hero_action_=hero_action::standing;
         }
         else
         {
-        this->hero_action_=hero_action::standing_left;
+            this->hero_action_=hero_action::standing_left;
         }
     }
 
@@ -315,7 +378,6 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
 
-    //optymalizuj to by sie nie powtarzaly te same instrukcje
     if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), standing_animations[0]) && !this->hero_jumping_ && !attack1_still_)                  //sprawdzamy czy bohater stoi na platformie
     {
         if(velocity_y_<10)
@@ -324,14 +386,6 @@ void player::hero_gravity_move()
         }
         this->hero_.move (0,velocity_y_);
 
-    }
-    else if(attack1_still_ && !collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), attack1_animations[0] ))
-    {
-        if(velocity_y_<10)
-        {
-            this->velocity_y_+=gravity_*time_.asSeconds ();
-        }
-        this->hero_.move (0,velocity_y_);
     }
     else
     {
@@ -381,13 +435,18 @@ void player::update_hero()
 
     if(hero_action_!=hero_action::dying)
     {
-    this->hero_check_moves ();                  //sprawdza czy bohater sie rusza
+        this->hero_check_moves ();                  //sprawdza czy bohater sie rusza
     }
 
     this->choose_hero_animation ();             //wybiera odpowiednia animacje bohatera
 
     this->check_hero_hp ();
 
+}
+
+void player::get_window_size(const sf::Vector2u &window_s)
+{
+    this->window_size_ = window_s;
 }
 
 sf::Sprite player::return_hero()
