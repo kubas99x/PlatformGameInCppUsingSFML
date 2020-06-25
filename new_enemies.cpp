@@ -13,7 +13,6 @@ new_enemies::new_enemies(const enemy_type &type ,float pos_x, float pos_y ,float
     this->enemy_type_=type;
     this->start_position_x_=pos_x;
     this->start_position_y_=pos_y;
-
     this->download_textures ();
     this->set_animations ();
     this->set_enemy ();
@@ -25,6 +24,7 @@ void new_enemies::init_variables()
     this->enemy_step_dying_=0;
     this->enemy_step_standing_=0;
     this->enemy_step_attack_=0;
+    this->enemy_step_walking_=0;
     this->was_attacked_ = false;
     this->dead_ = false;
     this->moving_left_ = false;
@@ -52,6 +52,18 @@ void new_enemies::download_textures()
         texture_.emplace_back(get_textures ("textures/wolf_death.png"));
         texture_.emplace_back(get_textures ("textures/wolf_attack_left.png"));         //3
         texture_.emplace_back(get_textures ("textures/wolf_attack.png"));               //4
+        texture_.emplace_back(get_textures ("textures/wolf_run.png"));             //5
+        texture_.emplace_back(get_textures ("textures/wolf_run_left.png"));             //6
+    }
+    if(enemy_type_==enemy_type::golem)
+    {
+        texture_.emplace_back(get_textures("textures/golem_standing.png"));              //0
+        texture_.emplace_back(get_textures("textures/golem_standing_left.png"));        //1
+        texture_.emplace_back(get_textures ("textures/golem_death.png"));                //2
+        texture_.emplace_back(get_textures ("textures/golem_attack_left.png"));         //3
+        texture_.emplace_back(get_textures ("textures/golem_attack.png"));               //4
+//        texture_.emplace_back(get_textures ("textures/wolf_run.png"));             //5
+//        texture_.emplace_back(get_textures ("textures/wolf_run_left.png"));             //6
     }
 }
 
@@ -64,22 +76,39 @@ void new_enemies::set_enemy()
     distance_=walk_distance_;
     waiting_time_=waiting_time_start_;
 
-    if(enemy_type_==enemy_type::skeleton)
+    switch (enemy_type_)
+    {
+    case enemy_type::skeleton:
     {
         enemy_action_=enemy_action::standing;
         enemy_sprite_.setScale (3.5,3.5);
         move_left=true;
         hp_=100;
         waiting_for_attack_=3;
+        break;
     }
-    if(enemy_type_==enemy_type::wolf)
+    case enemy_type::wolf:
     {
         enemy_action_=enemy_action::standing_left;
         enemy_sprite_.setScale (3,3);
         move_left=true;
         hp_=50;
-        waiting_for_attack_=2;
+        waiting_for_attack_=waiting_time_start_;
+        break;
     }
+    case enemy_type::golem:
+    {
+        enemy_action_=enemy_action::standing;
+        enemy_sprite_.setScale (3,3);
+        move_left=true;
+        hp_=150;
+        waiting_for_attack_=3;
+        break;
+    }
+    default:
+        break;
+    }
+
 }
 void new_enemies::set_animations()
 {
@@ -189,6 +218,65 @@ void new_enemies::set_animations()
         }
         animations_.emplace(enemy_action::attack, tmp_vector);
 
+        tmp_vector.clear ();
+        for(int i=11; i<64*8; i+=64)
+        {
+            tmp_vector.emplace_back(sf::IntRect(i,15,40,30));
+        }
+        animations_.emplace(enemy_action::walking_left, tmp_vector);
+
+        tmp_vector.clear ();
+        for(int i=13; i<64*8; i+=64)
+        {
+            tmp_vector.emplace_back(sf::IntRect(i,15,40,30));
+        }
+        animations_.emplace(enemy_action::walking, tmp_vector);
+
+    }
+
+    if(enemy_type_==enemy_type::golem)
+    {
+        std::vector <sf::IntRect> tmp_vector;
+
+        for(int i=15; i<64*12; i+=64)
+        {
+            tmp_vector.emplace_back(sf::IntRect(i,0,55,45));
+        }
+        animations_.emplace(enemy_action::standing,tmp_vector);
+
+        tmp_vector.clear ();
+        for(int i=10; i<64*12; i+=64)
+        {
+            tmp_vector.emplace_back(sf::IntRect(i,0,55,45));
+        }
+        animations_.emplace(enemy_action::standing_left,tmp_vector);
+
+        tmp_vector.clear ();
+        for(int i=15; i<64*28; i+=64)
+        {
+            tmp_vector.emplace_back(sf::IntRect(i,0,55,45));
+        }
+        animations_.emplace(enemy_action::dying,tmp_vector);
+
+        tmp_vector.clear ();
+        for(int i=20; i<80*16; i+=80)
+        {
+            if(i==420)
+                i-=10;
+            tmp_vector.emplace_back(sf::IntRect(i,0,60,45));
+            if(i==430)
+                i+=10;
+        }
+        animations_.emplace(enemy_action::attack_left,tmp_vector);
+
+        tmp_vector.clear ();
+        for(int i=0; i<80*16; i+=80)
+        {
+
+            tmp_vector.emplace_back(sf::IntRect(i,0,60,45));
+
+        }
+        animations_.emplace(enemy_action::attack,tmp_vector);
     }
 }
 
@@ -214,6 +302,19 @@ void new_enemies::update_enemy_frame()
         enemy_step_attack_++;
         enemy_frame_time_=0;
         enemy_animation_change_=true;
+        if(enemy_type_==enemy_type::golem)
+        {
+            if(enemy_step_attack_>=9 && enemy_step_attack_<=13)
+            {
+                can_deal_dmg_=true;
+            }
+            else
+            {
+                can_deal_dmg_=false;
+            }
+        }
+        else
+        {
         if(enemy_step_attack_>=6 && enemy_step_attack_<=12)
         {
             can_deal_dmg_=true;
@@ -222,6 +323,13 @@ void new_enemies::update_enemy_frame()
         {
             can_deal_dmg_=false;
         }
+        }
+    }
+    if(enemy_frame_time_>=1.0f/8.0f && (enemy_action_==enemy_action::walking || enemy_action_==enemy_action::walking_left) )
+    {
+        enemy_step_walking_++;
+        enemy_frame_time_=0;
+        enemy_animation_change_=true;
     }
 }
 void new_enemies::choose_enemy_animation()
@@ -264,14 +372,30 @@ void new_enemies::choose_enemy_animation()
                 this->enemy_sprite_.setTextureRect (this->animations_[enemy_action::dying][this->enemy_step_dying_]);
             }
         }
+        if(enemy_action_==enemy_action::walking)
+        {
+            if(this->enemy_step_walking_>=animations_[enemy_action::walking].size ()-1)
+            {
+                enemy_step_walking_=0;
+            }
+            this->enemy_sprite_.setTexture (texture_[5]);
+            this->enemy_sprite_.setTextureRect (this->animations_[enemy_action::walking][this->enemy_step_walking_]);
+        }
+        if(enemy_action_==enemy_action::walking_left)
+        {
+            if(this->enemy_step_walking_>=animations_[enemy_action::walking_left].size ()-1)
+            {
+                enemy_step_walking_=0;
+            }
+            this->enemy_sprite_.setTexture (texture_[6]);
+            this->enemy_sprite_.setTextureRect (this->animations_[enemy_action::walking_left][this->animations_[enemy_action::walking_left].size ()- 1 -this->enemy_step_walking_]);
+        }
         if(enemy_action_==enemy_action::attack_left)
         {
             if(this->enemy_step_attack_>=animations_[enemy_action::attack_left].size ()-1)
             {
                 enemy_step_attack_=0;
-
                 attacking_ = false;
-
             }
             this->enemy_sprite_.setTexture (texture_[3]);
             this->enemy_sprite_.setTextureRect (this->animations_[enemy_action::attack_left][animations_[enemy_action::attack_left].size ()-1 - this->enemy_step_attack_]);
@@ -282,9 +406,7 @@ void new_enemies::choose_enemy_animation()
             if(this->enemy_step_attack_>=animations_[enemy_action::attack].size ()-1)
             {
                 enemy_step_attack_=0;
-
                 attacking_ = false;
-
             }
             this->enemy_sprite_.setTexture (texture_[4]);
             this->enemy_sprite_.setTextureRect (this->animations_[enemy_action::attack][this->enemy_step_attack_]);
@@ -332,25 +454,28 @@ void new_enemies::move_enemy()
 
 void new_enemies::move_wolf()
 {
-    if(!attacking_ && wolf_running_)
+    if(wolf_running_)
     {
-        enemy_action_=enemy_action::standing_left;
-        if(move_left)
+
+        if(!attack_right_)
         {
+            enemy_action_=enemy_action::walking_left;
             enemy_sprite_.move (-0.5*walk_distance_*time_.asSeconds (),0);
         }
         else
         {
+            enemy_action_=enemy_action::walking;
             enemy_sprite_.move (0.5*walk_distance_*time_.asSeconds (),0);
         }
     }
     else if (attacking_ )
     {
         waiting_for_attack_-=time_.asSeconds ();
-        if(waiting_for_attack_<=0)
+        if(waiting_for_attack_<=0 && enemy_action_!=enemy_action::attack_left && enemy_action_!=enemy_action::attack)
         {
-        waiting_for_attack_=waiting_time_start_;
-        if(move_left)
+        can_attack_=true;
+        hited_hero_=false;
+        if(!attack_right_)
         {
             enemy_action_=enemy_action::attack_left;
         }
@@ -360,6 +485,11 @@ void new_enemies::move_wolf()
         }
         }
     }
+    else if(!attacking_ && !wolf_running_)
+    {
+        enemy_action_=enemy_action::standing_left;
+        waiting_for_attack_=waiting_time_start_;
+    }
 }
 void new_enemies::attack_stuff()
 {
@@ -368,9 +498,8 @@ void new_enemies::attack_stuff()
     {
         hited_hero_ = false;
         can_attack_=true;
-        waiting_for_attack_=5;
+        waiting_for_attack_=3;
     }
-
 }
 
 
@@ -393,42 +522,36 @@ void new_enemies::update_enemy()
     this->update_enemy_frame ();
     this->choose_enemy_animation ();
 
-    switch(enemy_type_)
-    {
-    case enemy_type::skeleton:
+
+    if(enemy_type_ == enemy_type::skeleton || enemy_type_ == enemy_type::golem )
     {
         this->move_enemy ();
-        break;
+        if(attacking_)
+        {
+            if(attack_right_)
+            {
+                this->enemy_action_= enemy_action::attack;
+            }
+            else
+            {
+                this->enemy_action_=enemy_action::attack_left;
+            }
+        }
+        if(!can_attack_ && !attacking_)
+        {
+            attack_stuff ();
+        }
     }
-    case enemy_type::wolf:
+    else
     {
         this->move_wolf ();
-        break;
-    }
-    default:
-    {
-        break;
-    }
+
     }
 
-    if(attacking_)
-    {
-        if(attack_right_)
-        {
-            this->enemy_action_= enemy_action::attack;
-        }
-        else
-        {
-            this->enemy_action_=enemy_action::attack_left;
-        }
-    }
-    if(!can_attack_ && !attacking_)
-    {
-        attack_stuff ();
-    }
+
     this->check_hp ();
-}
 
+}
 enemy_type new_enemies::return_enemy_type()
 {
     return enemy_type_;

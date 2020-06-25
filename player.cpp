@@ -61,6 +61,8 @@ void player::download_textures()
     this->textures_.emplace_back(this->get_textures ("textures/death.png"));        //7
     this->textures_.emplace_back(this->get_textures ("textures/spin_attack.png"));        //8
     this->textures_.emplace_back(this->get_textures ("textures/spin_attack_left.png"));        //9
+    this->textures_.emplace_back(this->get_textures ("textures/health_bar.png"));        //10
+
 
 }
 
@@ -69,7 +71,12 @@ void player::set_hero()
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (1500,200);
+    this->hero_.setPosition (0,200);        //2400
+    this->health_bar_.setTexture (this->textures_[10]);
+    this->health_bar_.setTextureRect (hp_steps_animations[0]);
+    this->health_bar_.setPosition (0,0);
+    this->health_bar_.setScale (4,4);
+
 }
 
 void player::set_hero_sprites()
@@ -132,6 +139,13 @@ void player::set_hero_sprites()
             i+=12;
         }
     }
+    hp_steps_animations.emplace_back(sf::IntRect(9,21,112,11));
+    hp_steps_animations.emplace_back(sf::IntRect(9,32,112,11));
+    hp_steps_animations.emplace_back(sf::IntRect(10,70,112,11));
+    hp_steps_animations.emplace_back(sf::IntRect(10,81,112,11));
+    hp_steps_animations.emplace_back(sf::IntRect(10,92,112,11));
+
+
 }
 
 
@@ -409,6 +423,37 @@ float player::return_hp()
 void player::check_hero_hp()
 {
     //dodaj napis przegranej itp.
+    if(hero_.getPosition ().x>720)
+    {
+    health_bar_.setPosition (hero_.getPosition ().x - 720 , 0);
+    }
+    if(hp_==100)
+    {
+        health_bar_.setTextureRect (hp_steps_animations[0]);
+    }
+    if(hp_==75)
+    {
+        health_bar_.setTextureRect (hp_steps_animations[1]);
+    }
+    if(hp_==50)
+    {
+        health_bar_.setTextureRect (hp_steps_animations[2]);
+    }
+    if(hp_==25)
+    {
+        health_bar_.setTextureRect (hp_steps_animations[3]);
+    }
+    if(hp_==0)
+    {
+        health_bar_.setTextureRect (hp_steps_animations[4]);
+    }
+
+
+
+
+
+
+
     if(hp_<=0)
     {
         hero_action_=hero_action::dying;
@@ -462,6 +507,7 @@ sf::IntRect player::return_standing_animation()
 void player::render(sf::RenderWindow &window)
 {
     window.draw(hero_);
+    window.draw (health_bar_);
 }
 
 

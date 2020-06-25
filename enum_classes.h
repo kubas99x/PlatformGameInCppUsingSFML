@@ -20,6 +20,7 @@ enum class enemy_type
     {
     skeleton,
     wolf,
+    golem,
 
 };
 
@@ -28,6 +29,7 @@ enum class enemy_action
     standing,
     standing_left,
     walking,
+    walking_left,
     dying,
     attack,
     attack_left,

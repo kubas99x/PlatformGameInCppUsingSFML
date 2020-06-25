@@ -27,12 +27,21 @@ Game::~Game()
     }
 }
 
+void Game::initWindow()
+{
+    this->window = new sf::RenderWindow(sf::VideoMode(1440, 900), "Sword and hammer", sf::Style::Close | sf::Style::Titlebar);
+    this->window->setFramerateLimit(60);
+    this->window->setVerticalSyncEnabled(false);
+    this->widok.setSize (1440,900);
+    this->window->setKeyRepeatEnabled(false);               //by wyrywalo klikniecie pojedyncze
+}
 void Game::add_enemies()
 {
     //typ , pos_x , pos_y, dystans_chodzenia, czas ktory czeka w miejscu (dla wilka czas po ktorym zaatakuje)
     enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 650, 700 , 250, 3 ));
-    enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 500, 700 , 200, 1 ));
-    enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 1800, 270 , 350, 2 ));
+    //enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 500, 700 , 200, 1 ));
+    //enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 1800, 270 , 350, 1 ));
+    //enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 1700, 230 , 350, 3 ));
 
 }
 
@@ -46,8 +55,11 @@ void Game::add_platforms()
     platforms_vector_.emplace_back(new new_platform(530,680,0.5,1,platform_type::wood));
 
     //platforma z interakcja
-    //float pos_x, float pos_y, float scale_x, float scale_y, float arm_x, float arm_y, const platform_type &type, bool interaction
-    platforms_vector_.emplace_back(new new_platform(1800,360,1,1,2100,195,platform_type::wood,true));
+    //float pos_x, float pos_y, float scale_x, float scale_y, float arm_x, float arm_y, const platform_type &type, bool interaction, bool moving_left_right
+    platforms_vector_.emplace_back(new new_platform(1800,360,1,1,2100,195,platform_type::wood,true,true));
+    platforms_vector_.emplace_back(new new_platform(2215,600,0.5,1,65,300,1480,835,platform_type::rock_pion,true));
+    platforms_vector_.emplace_back(new new_platform(1800,360,1,1,2100,195,platform_type::wood,true,true));
+    platforms_vector_.emplace_back(new new_platform(2600,-100,0.5,1,2280,305,platform_type::wood,true,false));
 
 
     platforms_vector_.emplace_back(new new_platform(0,817,1,1,700,50,platform_type::grass));
@@ -59,11 +71,18 @@ void Game::add_platforms()
     platforms_vector_.emplace_back(new new_platform(1465,650,1,0.5,250,65,platform_type::rock));
     platforms_vector_.emplace_back(new new_platform(1465,870,1,0.5,300,65,platform_type::rock));
     platforms_vector_.emplace_back(new new_platform(1960,550,1,0.5,300,65,platform_type::rock));
-    platforms_vector_.emplace_back(new new_platform(2220,0,0.7,1,65,620,platform_type::rock_pion));
+    platforms_vector_.emplace_back(new new_platform(2215,0,0.7,1,65,620,platform_type::rock_pion));
     platforms_vector_.emplace_back(new new_platform(1950,260,0.5,1,65,100,platform_type::rock_pion));
     platforms_vector_.emplace_back(new new_platform(1900,870,1,0.5,130,65,platform_type::rock));
-    platforms_vector_.emplace_back(new new_platform(2170,870,1,0.5,800,65,platform_type::rock));
+    platforms_vector_.emplace_back(new new_platform(2170,870,1,0.5,830,65,platform_type::rock));
+    platforms_vector_.emplace_back(new new_platform(2220,340,1,0.5,250,65,platform_type::rock));
+    platforms_vector_.emplace_back(new new_platform(2880,300,0.5,1,65,570,platform_type::rock_pion));
+    platforms_vector_.emplace_back(new new_platform(2880,300,1,0.5,300,65,platform_type::rock));
 
+    //ruszajce sie platformy
+    platforms_vector_.emplace_back(new new_platform(2600,730,0.5,1,platform_type::wood, true , 300, false));
+    platforms_vector_.emplace_back(new new_platform(2500,600,0.5,1,platform_type::wood, true , 200 , true));
+    platforms_vector_.emplace_back(new new_platform(2600,470,0.5,1,platform_type::wood, true , 300, false));
 
     //spikes    //wyskosc 12 maja
     platforms_vector_.emplace_back(new new_platform(1770,850,4,4,30,12,platform_type::spikes));
@@ -71,14 +90,7 @@ void Game::add_platforms()
 
 }
 
-void Game::initWindow()
-{
-    this->window = new sf::RenderWindow(sf::VideoMode(1440, 900), "Sword and hammer", sf::Style::Close | sf::Style::Titlebar);
-    this->window->setFramerateLimit(60);
-    this->window->setVerticalSyncEnabled(false);
-    this->widok.setSize (1440,900);
-    this->window->setKeyRepeatEnabled(false);               //by wyrywalo klikniecie pojedyncze
-}
+
 
 void Game::initVariables()
 {
@@ -118,18 +130,23 @@ void Game::check_all_collisions()
     {
         if(player_->hero_action_!=hero_action::dying && el->damage_platform && collision_->check_platform_damage_collision (player_->return_hero (), el->return_sprite (), player_->return_standing_animation ()))
         {
-                player_->hp_-=50;
-                std::cout<<"player hp: "<<player_->hp_<<std::endl;
+
+            player_->hp_-=50;
+            std::cout<<"player hp: "<<player_->hp_<<std::endl;
         }
     }
-
-    //atakowanie przeciwnika
+    if(player_->return_hero ().getGlobalBounds ().top > window->getSize ().y && player_->return_hp ()>0)
+    {
+        player_->hp_-=100;
+        std::cout<<"player hp: "<<player_->hp_<<std::endl;
+    }
 
     //wilk po wykryciu ruchu po danej stronie zaczyna tam biec, dopiero jak jest blisko to zaczyna atakowac
     for(auto &el : enemies_vector_)
     {
         if(el->can_attack_ && collision_->is_player_near (player_->return_hero (), el->return_enemy_sprite () , el->return_enemy_type ()))
         {
+            //okreslamy tylkko w ktora strone bedzie atakowal
             if(player_->return_hero_x_position () < el->return_enemy_sprite ().getPosition ().x)
             {
                 el->attack_right_=false;
@@ -139,26 +156,19 @@ void Game::check_all_collisions()
                 el->attack_right_=true;
             }
 
-            if(el->return_enemy_type () ==enemy_type::wolf)
+
+            if(el->return_enemy_type ()==enemy_type::wolf)
             {
-                //jezeli jeszcze by nie trafilo ugryzienie to biegnij dalej
-                if(!el->attacking_ && !collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ()))
+                //sprawdzamy czy jest w stanie trafić
+                if(!el->attacking_ && !collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite()))
                 {
-                    //el->attacking_=false;
                     el->wolf_running_=true;
-                    if(player_->return_hero_x_position () < el->return_enemy_sprite ().getPosition ().x)
-                    {
-                        el->move_left=true;
-                    }
-                    else
-                    {
-                        el->move_left=false;
-                    }
                 }
-                else
+                else if (el->can_attack_ && !el->attacking_ && player_->hero_action_!=hero_action::dying)
                 {
                     el->wolf_running_=false;
                     el->attacking_=true;
+                    el->can_attack_=false;
                 }
             }
             else
@@ -168,15 +178,18 @@ void Game::check_all_collisions()
             }
 
         }
-        else if(el->return_enemy_type () ==enemy_type::wolf)
-        {
-            el->wolf_running_=false;
-        }
         if(el->attacking_ && !el->hited_hero_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite ())
                 && el->can_deal_dmg_)
         {
             el->hited_hero_ = true;
-            player_->hp_-=50;
+            if(el->return_enemy_type ()==enemy_type::golem)
+            {
+                player_->hp_-=100;
+            }
+            else
+            {
+                player_->hp_-=50;
+            }
             std::cout<<"player hp:"<<player_->hp_<<std::endl;
         }
     }
@@ -187,12 +200,12 @@ void Game::check_all_collisions()
 
 void Game::check_enemy_hp_()
 {
-     for(size_t i=0; i<enemies_vector_.size (); i++)
+    for(size_t i=0; i<enemies_vector_.size (); i++)
     {
-      if(enemies_vector_[i]->dead_==true)
-      {
-          enemies_vector_.erase (enemies_vector_.begin ()+i);
-      }
+        if(enemies_vector_[i]->dead_==true)
+        {
+            enemies_vector_.erase (enemies_vector_.begin ()+i);
+        }
     }
 }
 
@@ -218,19 +231,11 @@ void Game::updatePollEvents()
                         collision_->check_fighting_collision (player_->return_hero (), platforms_vector_[i]->return_sprite_interaction ())
                         && !platforms_vector_[i]->interaction_switched_)
                 {
-
-                        platforms_vector_[i]->interaction_switched_=true;
+                    platforms_vector_[i]->interaction_switched_=true;
 
                 }
             }
         }
-
-        //do robienie dodga
-//        if (e.Event::KeyReleased && e.Event::key.code == sf::Keyboard::Right )
-//        {
-//            std::cout<<"JEB JEB"<<std::endl;
-//        }
-
     }
 }
 
@@ -244,9 +249,14 @@ void Game::update()
 
     if(hero_x_position_>= window->getSize ().x/2.0f)
     {
-    this->widok.setCenter (hero_x_position_, window->getSize ().y/2);
+        this->widok.setCenter (hero_x_position_, window->getSize ().y/2);
 
-    this->window->setView (widok);
+        this->window->setView (widok);
+    }
+    else if (widok.getCenter ().x != 0)
+    {
+        this->widok.setCenter (widok.getSize ().x /2, window->getSize ().y/2);
+        this->window->setView (widok);
     }
 
     //kopiowanie platform, na razie tak bo nie mam innego pomyslu
@@ -256,7 +266,7 @@ void Game::update()
     {
         if(!el->damage_platform)
         {
-        collision_->copy_platforms (el->return_sprite ());
+            collision_->copy_platforms (el->return_sprite ());
         }
     }
 

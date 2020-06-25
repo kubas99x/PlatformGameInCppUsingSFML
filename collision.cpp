@@ -38,7 +38,7 @@ bool collision::check_standing_collision(const sf::Sprite &hero ,  const float &
         float intersect_x = std::abs(delta_x) - (guy_width + el_width) ;
         float intersect_y = std::abs(delta_y) - (guy_height + el_height);
 
-        if(intersect_x < 0.0f && intersect_y < 0.0f )
+        if(intersect_x < 0.0f && intersect_y < 0.0f && el_position_y>guy_position_y )
         {
             return true;
 
@@ -178,10 +178,9 @@ bool collision::is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy, 
     float intersect_x = std::abs(delta_x) - (guy_width + el_width);
     float intersect_y = std::abs(delta_y) - (guy_height + el_height);
 
-    if(intersect_x < 0.0f && intersect_y < 0.0f)
+    if(intersect_x < 0.0f && intersect_y < 0.0f )
     {
         return true;
-
     }
 
     return false;

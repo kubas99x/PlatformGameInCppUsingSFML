@@ -33,6 +33,7 @@ private:
     int enemy_step_standing_;//
     int enemy_step_dying_;
     int enemy_step_attack_;
+    int enemy_step_walking_;
     bool enemy_animation_change_;//
     bool moving_left_;                  //do ustalania animacji
 

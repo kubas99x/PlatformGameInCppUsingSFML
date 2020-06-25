@@ -18,7 +18,21 @@ new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_
     download_textures ();
     set_sprites (pos_x, pos_y, scale_x, scale_y);
 }
-new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_y, float arm_x, float arm_y, const platform_type &type, bool interaction )
+
+new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_y, const platform_type &type, bool moving , float moving_distance , bool movig_right)
+{
+    this->type_=type;
+    download_textures ();
+    set_sprites (pos_x, pos_y, scale_x, scale_y);
+    this->moving_=moving;
+    this->distance_=moving_distance;
+    this->distance_tmp_=moving_distance;
+    this->moving_right=movig_right;
+
+}
+
+//platformy z dzwigniami
+new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_y, float arm_x, float arm_y, const platform_type &type, bool interaction , bool moving_left_right)
 {
 
     this->type_=type;
@@ -26,7 +40,45 @@ new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_
     download_textures ();
     set_sprites (pos_x, pos_y, scale_x, scale_y);
     set_arm_interaction_ (arm_x,arm_y);
+    this->moving_left_right_=moving_left_right;
+    if(moving_left_right_)
+    {
+    if(type_==platform_type::rock_pion)
+    {
+        distance_=sprite_.getGlobalBounds ().height;
+    }
+    else
+    {
+        distance_=sprite_.getGlobalBounds ().width;
+    }
+    }
+    else
+    {
+        distance_=400;
+    }
+    distance_tmp_=distance_;
 }
+
+new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_y, float width, float height, float arm_x, float arm_y, const platform_type &type, bool interaction )
+{
+
+    this->type_=type;
+    this->interaction_=interaction;
+    download_textures ();
+    set_sprites (pos_x, pos_y, scale_x, scale_y, width, height);
+    set_arm_interaction_ (arm_x,arm_y);
+    if(type_==platform_type::rock_pion)
+    {
+        distance_=sprite_.getGlobalBounds ().height + 50;
+    }
+    else
+    {
+        distance_=sprite_.getGlobalBounds ().width + 50;
+    }
+    distance_tmp_=distance_;
+}
+
+
 
 new_platform::~new_platform()
 {
@@ -139,10 +191,56 @@ void new_platform::chagne_arm_interaction()
 
 void new_platform::move_platform(float time)
 {
-    if(distance>0)
+    if(moving_left_right_)
     {
-    this->sprite_.move (-1*distance*time,0);
-    distance-=distance*time;
+    if(type_==platform_type::rock_pion)
+    {
+        if(distance_>0)
+        {
+            this->sprite_.move (0,-1*distance_tmp_*time);
+            distance_-=distance_tmp_*time;
+        }
+    }
+    else
+    {
+        if(distance_>0)
+        {
+            this->sprite_.move (-1*distance_tmp_*time,0);
+            distance_-=distance_tmp_*time;
+        }
+    }
+    }
+    else
+    {
+        if(distance_>0)
+        {
+            this->sprite_.move (0,1*distance_tmp_*time);
+            distance_-=distance_tmp_*time;
+        }
+    }
+}
+
+void new_platform::moving_side_to_side(float time)
+{
+    if(moving_right)
+    {
+        sprite_.move (0.3*distance_tmp_*time,0);
+        distance_-=0.3*distance_tmp_*time;
+        if(distance_<=0)
+        {
+            moving_right=false;
+            distance_=distance_tmp_;
+        }
+    }
+    else
+    {
+        sprite_.move (-0.3*distance_tmp_*time,0);
+        distance_-=0.3*distance_tmp_*time;
+        if(distance_<=0)
+        {
+            moving_right=true;
+            distance_=distance_tmp_;
+        }
     }
 }
 
@@ -153,9 +251,13 @@ void new_platform::update_platform(float time)
 
         if(!changed_arm_)
         {
-        this->chagne_arm_interaction ();
+            this->chagne_arm_interaction ();
         }
         this->move_platform (time);
+    }
+    if(moving_)
+    {
+        moving_side_to_side (time);
     }
 }
 void new_platform::render(sf::RenderWindow &window)

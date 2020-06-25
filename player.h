@@ -34,6 +34,11 @@ private:
     std::vector <sf::IntRect> spin_attack_animations;
     std::vector <sf::IntRect> spin_attack_animations_left;
 
+    //health
+    sf::Sprite health_bar_;
+    std::vector <sf::IntRect> hp_steps_animations;
+    void check_hero_hp();
+
 
     //functions
     void download_textures();
@@ -47,7 +52,7 @@ private:
     void hero_check_moves();
     void hero_gravity_move();
     void hero_jumping();
-    void check_hero_hp();
+
 
     //hero variables
     float hero_frame_time_;
