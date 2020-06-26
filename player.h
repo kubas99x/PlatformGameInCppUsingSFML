@@ -3,6 +3,7 @@
 
 #include <texture_functions.h>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include <collision.h>
 #include "enum_classes.h"
@@ -54,6 +55,7 @@ private:
     void hero_jumping();
 
 
+
     //hero variables
     float hero_frame_time_;
     int hero_step_int_standing_;
@@ -62,7 +64,10 @@ private:
     int hero_step_int_attack1_;
     int hero_step_int_dying_;
 
-
+    //sound effects
+    std::vector <sf::SoundBuffer> buffer;
+    sf::Sound sound;
+    void set_sound_effects();
 
     //Variables
     float gravity_;
@@ -75,7 +80,6 @@ private:
     //bools
     bool hero_animation_change_;
     bool walking_;
-    bool hero_in_air_;
     bool can_jump_;
     bool hero_jumping_;
     bool attack1_;
@@ -93,6 +97,7 @@ public:
 
     //Enum
     hero_action hero_action_;
+
     float hp_;
 
     //public functions

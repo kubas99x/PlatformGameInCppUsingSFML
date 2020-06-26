@@ -197,16 +197,16 @@ void new_platform::move_platform(float time)
     {
         if(distance_>0)
         {
-            this->sprite_.move (0,-1*distance_tmp_*time);
-            distance_-=distance_tmp_*time;
+            this->sprite_.move (0,-1*velocity_*time);
+            distance_-=velocity_*time;
         }
     }
     else
     {
         if(distance_>0)
         {
-            this->sprite_.move (-1*distance_tmp_*time,0);
-            distance_-=distance_tmp_*time;
+            this->sprite_.move (-1*velocity_*time,0);
+            distance_-=velocity_*time;
         }
     }
     }
@@ -214,8 +214,8 @@ void new_platform::move_platform(float time)
     {
         if(distance_>0)
         {
-            this->sprite_.move (0,1*distance_tmp_*time);
-            distance_-=distance_tmp_*time;
+            this->sprite_.move (0,1*velocity_*time);
+            distance_-=velocity_*time;
         }
     }
 }
@@ -224,8 +224,8 @@ void new_platform::moving_side_to_side(float time)
 {
     if(moving_right)
     {
-        sprite_.move (0.3*distance_tmp_*time,0);
-        distance_-=0.3*distance_tmp_*time;
+        sprite_.move (0.3*velocity_*time,0);
+        distance_-=0.3*velocity_*time;
         if(distance_<=0)
         {
             moving_right=false;
@@ -234,8 +234,8 @@ void new_platform::moving_side_to_side(float time)
     }
     else
     {
-        sprite_.move (-0.3*distance_tmp_*time,0);
-        distance_-=0.3*distance_tmp_*time;
+        sprite_.move (-0.3*velocity_*time,0);
+        distance_-=0.3*velocity_*time;
         if(distance_<=0)
         {
             moving_right=true;

@@ -21,6 +21,8 @@ enum class enemy_type
     skeleton,
     wolf,
     golem,
+    demon,
+    none,
 
 };
 

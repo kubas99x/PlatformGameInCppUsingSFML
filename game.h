@@ -2,6 +2,7 @@
 #define GAME_H
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include "background.h"
 #include "player.h"
@@ -32,6 +33,20 @@ private:
     //platfroms
     std::vector <new_platform*>  platforms_vector_;
 
+    //poczatek gry
+    sf::Texture texture_start_;
+    sf::Sprite sprite_start_;
+    bool game_start_=false;
+
+    //koniec gry
+    bool game_end_=false;
+    sf::Text text_;
+    sf::Font font_;
+
+    //music
+    void set_music();
+    sf::Music music_;
+    bool second_music_;
 
     //Private void functions
     void initWindow();
@@ -40,6 +55,8 @@ private:
     void add_enemies();
     void add_platforms();
     void check_enemy_hp_();
+    void init_game_start_end();
+
 
 public:
     Game();

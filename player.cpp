@@ -17,6 +17,7 @@ player::player(collision *wsk)
     this->set_hero_sprites ();
     this->set_hero ();
     this->init_variables ();
+    this->set_sound_effects ();
 }
 player::~player()
 {
@@ -30,6 +31,7 @@ void player::init_variables()
     this->hero_step_int_jumping_=0;
     this->hero_step_int_attack1_=0;
     this->hero_step_int_dying_=0;
+    this->hero_frame_time_=0;
     this->velocity_x_=230;
     this->velocity_y_=0;
     this->gravity_=5;
@@ -37,7 +39,6 @@ void player::init_variables()
     this->velocity_jumping_start_=150;
     this->hero_animation_change_=false;
     this->walking_=false;
-    this->hero_in_air_=true;
     this->can_jump_ = true;
     this->hero_jumping_ = false;
     this->hero_action_=hero_action::standing;
@@ -71,11 +72,19 @@ void player::set_hero()
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
-    this->hero_.setPosition (0,200);        //2400
+    this->hero_.setPosition (0,100);         //1500         //2300
     this->health_bar_.setTexture (this->textures_[10]);
     this->health_bar_.setTextureRect (hp_steps_animations[0]);
     this->health_bar_.setPosition (0,0);
     this->health_bar_.setScale (4,4);
+
+}
+void player::set_sound_effects()
+{
+    sound.setLoop (true);
+    buffer.emplace_back(load_sound_effect ("music/attack.wav"));
+    buffer.emplace_back(load_sound_effect ("music/spin_attack1.wav"));
+    buffer.emplace_back(load_sound_effect ("music/hero_dying.wav"));
 
 }
 
@@ -97,7 +106,7 @@ void player::set_hero_sprites()
         walking_animations.emplace_back(sf::IntRect(i,25,45,55));
     }
 
-    //jumping animations
+    //jumping animation
     jumping_animations.emplace_back(sf::IntRect(2990,15,60,55));
 
     //fighting animations
@@ -109,10 +118,14 @@ void player::set_hero_sprites()
     {
         attack1_animations_left.emplace_back(sf::IntRect(i,25,60,55));
     }
+
+    //dying animations
     for(int i=60; i<170*41; i+=170)
     {
         dying_animations.emplace_back(sf::IntRect(i,25,60,55));
     }
+
+    //spin attack animations
     for(int i=60; i<170*30; i+=170)
     {
         if(i==2440)
@@ -139,6 +152,8 @@ void player::set_hero_sprites()
             i+=12;
         }
     }
+
+    //hp_bar animations
     hp_steps_animations.emplace_back(sf::IntRect(9,21,112,11));
     hp_steps_animations.emplace_back(sf::IntRect(9,32,112,11));
     hp_steps_animations.emplace_back(sf::IntRect(10,70,112,11));
@@ -283,7 +298,7 @@ void player::choose_hero_animation()
 void player::hero_check_moves()
 {
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
-
+    bool stoped_attacking=false;     //bool zeby miedzy atakami byla chociaz 1 klatka przerwy
     if((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && this->can_jump_) || this->hero_jumping_)
     {
         this->can_jump_  = false;
@@ -330,10 +345,14 @@ void player::hero_check_moves()
         if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking )
         {
             this->hero_action_=hero_action::attack1;                 //warunek okreslajacy w ktora strone jest skierowany bohater
+            sound.setBuffer(buffer[0]);
+            sound.play();
         }
-        else if (this->hero_action_!=hero_action::attack1)
+        else if (this->hero_action_!=hero_action::attack1 && hero_action_!=hero_action::attack1_left )
         {
             this->hero_action_=hero_action::attack1_left;
+            sound.setBuffer(buffer[0]);
+            sound.play();
         }
         any=true;
         attack1_=false;
@@ -344,20 +363,26 @@ void player::hero_check_moves()
             attack1_=true;
             attack1_still_=false;
             hero_step_int_attack1_++;
+            stoped_attacking=true;
+            sound.stop ();
         }
     }
 
     //Spin attack
-    if((sf::Keyboard::isKeyPressed(sf::Keyboard::X) && spin_attack_ && !attack1_still_) || spin_attack_still_ )
+    if((sf::Keyboard::isKeyPressed(sf::Keyboard::X) && spin_attack_ && !attack1_still_ && !stoped_attacking) || spin_attack_still_ )
     {
 
         if(this->hero_action_==hero_action::standing || this->hero_action_==hero_action::walking )
         {
             this->hero_action_=hero_action::spin_attack;                 //warunek okreslajacy w ktora strone jest skierowany bohater
+            sound.setBuffer(buffer[1]);
+            sound.play();
         }
-        else if (this->hero_action_!=hero_action::spin_attack)
+        else if (this->hero_action_!=hero_action::spin_attack && hero_action_!=hero_action::spin_attack_left )
         {
             this->hero_action_=hero_action::spin_attack_left;
+            sound.setBuffer(buffer[1]);
+            sound.play();
         }
         any=true;
         spin_attack_=false;
@@ -368,6 +393,8 @@ void player::hero_check_moves()
             spin_attack_=true;
             spin_attack_still_=false;
             hero_step_int_attack1_++;
+            sound.stop ();
+
         }
     }
     if(hero_jumping_ && !attack1_still_ && !spin_attack_still_)
@@ -392,7 +419,7 @@ void player::hero_check_moves()
 void player::hero_gravity_move()
 {
 
-    if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), standing_animations[0]) && !this->hero_jumping_ && !attack1_still_)                  //sprawdzamy czy bohater stoi na platformie
+    if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), standing_animations[0]) && !this->hero_jumping_ )                  //sprawdzamy czy bohater stoi na platformie
     {
         if(velocity_y_<10)
         {
@@ -410,6 +437,8 @@ void player::hero_gravity_move()
 
 
 
+
+
 float player::return_hero_x_position()
 {
     return hero_.getPosition ().x;
@@ -423,9 +452,13 @@ float player::return_hp()
 void player::check_hero_hp()
 {
     //dodaj napis przegranej itp.
-    if(hero_.getPosition ().x>720)
+    if(hero_.getPosition ().x>2880)
     {
-    health_bar_.setPosition (hero_.getPosition ().x - 720 , 0);
+        health_bar_.setPosition (2880 , 0);
+    }
+    else if(hero_.getPosition ().x>720)
+    {
+        health_bar_.setPosition (hero_.getPosition ().x - 720 , 0);
     }
     if(hp_==100)
     {
@@ -443,28 +476,37 @@ void player::check_hero_hp()
     {
         health_bar_.setTextureRect (hp_steps_animations[3]);
     }
-    if(hp_==0)
+    if(hp_<=0 && hero_action_!=hero_action::dying)
     {
+        sound.setLoop (false);
+        sound.setBuffer(buffer[2]);
+        sound.play();
         health_bar_.setTextureRect (hp_steps_animations[4]);
-    }
-
-
-
-
-
-
-
-    if(hp_<=0)
-    {
         hero_action_=hero_action::dying;
     }
+
     if(this->hero_step_int_dying_>=dying_animations.size ()-1)
     {
         hp_=100;
         hero_step_int_dying_=0;
-        hero_.setPosition (0,200);
         hero_action_=hero_action::standing;
         was_walking_left_= false;
+        sound.setLoop (true);
+        sound.stop ();
+        if(hero_.getPosition ().x>2880)
+        {
+            hero_.setPosition (2890 , 100);
+        }
+        else if(hero_.getPosition ().x>1400)
+        {
+            hero_.setPosition (1400 , 100);
+        }
+        else
+        {
+            hero_.setPosition (0,200);
+            health_bar_.setPosition (0 , 0);
+        }
+
     }
 
 }

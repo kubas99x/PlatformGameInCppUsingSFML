@@ -29,21 +29,21 @@ void background::download_textures()
 {
     this->textures_.emplace_back(this->get_textures ("textures/scene1.png"));
     this->textures_.emplace_back(this->get_textures ("textures/scene2.png"));
-
+    this->textures_.emplace_back(this->get_textures ("textures/scene3.png"));
 }
 
 void background::download_sprites()
 {
     this->sprites_.emplace_back(get_sprites(this->textures_[0]));
     this->sprites_.emplace_back(get_sprites(this->textures_[1]));
-
+    this->sprites_.emplace_back(get_sprites(this->textures_[2]));
 }
 
 void background::set_sprites()
 {
     sprites_[0].setPosition (0,0);
     sprites_[1].setPosition (1440,0);
-
+    sprites_[2].setPosition (2880,0);
 }
 
 

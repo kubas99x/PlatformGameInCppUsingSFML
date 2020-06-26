@@ -85,7 +85,7 @@ bool collision::check_walking_collision(const sf::Sprite &hero , const float &ne
 
 }
 
-bool collision::check_fighting_collision(const sf::Sprite &hero, const sf::Sprite &enemy)
+bool collision::check_fighting_collision(const sf::Sprite &hero, const sf::Sprite &enemy , const enemy_type &enemy_type)
 {
     sf::Sprite guy = hero;
     float guy_width = guy.getGlobalBounds ().width/2.0f;
@@ -95,12 +95,16 @@ bool collision::check_fighting_collision(const sf::Sprite &hero, const sf::Sprit
 
     guy_width-=40;                                                     //by zmienic hitpointy
 
-
     float el_width = enemy.getGlobalBounds ().width/2.0f;
     float el_height = enemy.getGlobalBounds ().height/2.0f ;
     float el_position_x = enemy.getPosition ().x + el_width;
     float el_position_y = enemy.getPosition ().y + el_height;
     el_height-=30;
+    if(enemy_type==enemy_type::demon)
+    {
+        el_height-=50;
+        el_width-=50;
+    }
 
     float delta_x = el_position_x - guy_position_x;
     float delta_y = el_position_y - guy_position_y;
@@ -157,13 +161,17 @@ bool collision::is_player_near(const sf::Sprite &hero, const sf::Sprite &enemy, 
     float guy_position_x = guy.getPosition ().x + guy_width;
     float guy_position_y = guy.getPosition ().y + guy_height -1 ;      // -1 bo czasami wartosc intersect_y jest na poziomie ujemnych czesci tysiecznych
 
-    if(enemy_type==enemy_type::skeleton)
-    {
-        guy_width+=150;
-    }
-    else if (enemy_type== enemy_type::wolf)
+    if (enemy_type== enemy_type::wolf)
     {
         guy_width+=500;
+    }
+    else if(enemy_type==enemy_type::demon)
+    {
+        guy_width+=50;
+    }
+    else
+    {
+        guy_width+=150;
     }
 
 

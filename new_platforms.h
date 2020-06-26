@@ -25,6 +25,7 @@ private:
     sf::Texture texture_interaction_;
     float distance_;
     float distance_tmp_;
+    float velocity_=200;
     bool moving_left_right_=true;
 
 

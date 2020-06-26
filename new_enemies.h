@@ -1,8 +1,12 @@
 #ifndef NEW_ENEMIES_H
 #define NEW_ENEMIES_H
-#include "texture_functions.h"
+
 #include "SFML/Graphics.hpp"
+#include <SFML/Audio.hpp>
+
+#include "texture_functions.h"
 #include "enum_classes.h"
+
 #include <vector>
 #include <map>
 
@@ -28,6 +32,15 @@ private:
     //mapa z roznymi animacjami (ktora bedzie zawiera kwadraty ktore trzeba wziac z tekstury)
     std::map <enemy_action,std::vector<sf::IntRect>> animations_;
 
+    //health bar bossa
+    sf::Sprite health_bar_;
+    std::vector <sf::IntRect> health_animations_;
+
+    //sound effects
+    std::vector <sf::SoundBuffer> buffer;
+    sf::Sound sound;
+    void set_sound_effects();
+
     //variables
     float enemy_frame_time_;//
     int enemy_step_standing_;//
@@ -45,6 +58,7 @@ private:
     float walk_distance_;
     float waiting_time_start_;
     float waiting_for_attack_;
+    float velocity_;
 
 
 
@@ -62,7 +76,7 @@ private:
 
 public:
     //enemy variables
-    float hp_;
+    int hp_;
     bool dead_;
     bool was_attacked_;
     bool attacking_;                //czy postac jest w trakcie ataku

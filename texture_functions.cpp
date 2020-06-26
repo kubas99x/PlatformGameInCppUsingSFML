@@ -23,3 +23,13 @@ sf::Sprite  texture_functions::get_sprites(const sf::Texture &texture)
     sprite_tmp.setTexture (texture);
     return sprite_tmp;
 }
+
+sf::SoundBuffer texture_functions::load_sound_effect(std::string file_name)
+{
+    sf::SoundBuffer buffer_tmp;
+        if (!buffer_tmp.loadFromFile(file_name))
+        {
+            std::cerr<<"sound not loaded"<<std::endl;
+        }
+       return buffer_tmp;
+}
