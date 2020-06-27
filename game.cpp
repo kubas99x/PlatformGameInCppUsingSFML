@@ -33,17 +33,37 @@ Game::~Game()
 
 void Game::initWindow()
 {
+    /*
+     tworzenie okna, ustawianie limitu klatek
+     synchronizacji pionowej
+    */
     this->window = new sf::RenderWindow(sf::VideoMode(1440, 900), "Sword and hammer", sf::Style::Close | sf::Style::Titlebar);
     this->window->setFramerateLimit(60);
     this->window->setVerticalSyncEnabled(false);
     this->widok.setSize (1440,900);
     this->window->setKeyRepeatEnabled(false);               //by wyrywalo klikniecie pojedyncze
 
+}
 
+void Game::initVariables()
+{
+    /*
+     ustawianie zmiennych
+    */
+    this->hero_x_position_=0;
+    this->second_music_=false;
+    for(const auto &el : platforms_vector_)
+    {
+        collision_->copy_platforms (el->return_sprite ());
+    }
+    this->player_->get_window_size (window->getSize ());
 }
 
 void Game::init_game_start_end()
 {
+    /*
+     ustawianie napisow na poczatku i na koncu gry
+    */
     //start game
     this->texture_start_.loadFromFile ("textures/game_info.png");
     this->sprite_start_.setTexture (texture_start_);
@@ -53,26 +73,31 @@ void Game::init_game_start_end()
 
     //end game
     this->font_.loadFromFile ("textures/font2.ttf");
-    this->text_.setFont(font_); // font is a sf::Font
+    this->text_.setFont(font_);
     this->text_.setString("WYGRANA");
-    this->text_.setCharacterSize(175); // in pixels, not points!
+    this->text_.setCharacterSize(175);
     this->text_.setFillColor(sf::Color::White);
     this->text_.setPosition (2880,350);
 }
 void Game::set_music()
 {
+    /*
+     ustawianie dzwiekow ktore graja w tle, glosnosci itp.
+     ze sa to dzwieki dlugie i ktore waza sporo uzylem "music"
+     ktora nie "pobiera" muzyki a bardziej ja zaczyna odtwarzac wprost z danego folderu
+    */
     if(!second_music_)
     {
-    if (!music_.openFromFile("music/music5.ogg"))
-    std::cout<<"error with music"<<std::endl;
-    music_.setLoop (true);
-    music_.setVolume (20);
-    music_.play();
+        if (!music_.openFromFile("music/music5.ogg"))
+            std::cerr<<"error with music"<<std::endl;
+        music_.setLoop (true);
+        music_.setVolume (20);
+        music_.play();
     }
     else
     {
         if (!music_.openFromFile("music/music1.ogg"))
-        std::cout<<"error with music"<<std::endl;
+            std::cerr<<"error with music"<<std::endl;
         music_.setLoop (true);
         music_.setVolume (20);
         music_.play();
@@ -81,21 +106,24 @@ void Game::set_music()
 
 void Game::add_enemies()
 {
+    /*
+     Dodawanie przeciwnikow wedlug schematu ponizej
+    */
     //typ , pos_x , pos_y, dystans_chodzenia, czas ktory czeka w miejscu (dla wilka czas po ktorym zaatakuje)
+
     //Skeletons
     enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 650, 700 , 200, 3 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 400, 700 , 200, 1 ));
-    enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 2120, 440 , 180, 3 ));
+    enemies_vector_.emplace_back(new new_enemies(enemy_type::skeleton, 2120, 440 , 180, 2 ));
 
     //Wolfs
-    enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 1800, 270 , 450, 0.5 ));
+    enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 1800, 270 , 450, 0.25 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 2700, 785 , 500, 0.25 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::wolf, 2600, 785 , 400, 0.25 ));
 
     //Golems
     enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 1700, 230 , 350, 3 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 2000, 100 , 0, 3 ));
-    enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 3100, 170 , 200, 3 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 1600, 520 , 100, 3 ));
     enemies_vector_.emplace_back(new new_enemies(enemy_type::golem, 1600, 740 , 150, 2 ));
 
@@ -105,6 +133,15 @@ void Game::add_enemies()
 
 void Game::add_platforms()
 {
+    /*
+     dodawanie platform,
+     ze jest kilka typow sa rozne konstruktory parametrowe zaleznie od tego co chcemy wstawic
+     -platformy zwykle
+     -platformy ruszajace sie na boki
+     -platformy ktore reaguja na dzwignie
+     -platformy zadajace obrazenia
+    */
+
     //pos_x , pos_y , scale_x, scale_y , width, height, platform_type type
     //podstawowa wysokosc tekstury - 65
     platforms_vector_.emplace_back(new new_platform(740,600,0.5,1,platform_type::wood));
@@ -155,7 +192,7 @@ void Game::add_platforms()
     platforms_vector_.emplace_back(new new_platform(2500,600,0.5,1,platform_type::wood, true , 200 , true));
     platforms_vector_.emplace_back(new new_platform(2600,470,0.5,1,platform_type::wood, true , 300, false));
 
-    //spikes    //wyskosc 12 maja
+    //spikes
     platforms_vector_.emplace_back(new new_platform(1770,850,4,4,30,12,platform_type::spikes));
     platforms_vector_.emplace_back(new new_platform(2035,850,4,4,30,12,platform_type::spikes));
     platforms_vector_.emplace_back(new new_platform(2035,850,4,4,30,12,platform_type::spikes));
@@ -165,22 +202,16 @@ void Game::add_platforms()
     platforms_vector_.emplace_back(new new_platform(3845,850,4,4,30,12,platform_type::spikes));
 }
 
-
-
-void Game::initVariables()
-{
-    this->hero_x_position_=0;
-    this->second_music_=false;
-    for(const auto &el : platforms_vector_)
-    {
-        collision_->copy_platforms (el->return_sprite ());
-    }
-    this->player_->get_window_size (window->getSize ());
-}
-
 void Game::check_all_collisions()
 {
+    /*
+     funkcja do sprawdzania kolizji
+     gracz-przeciwnicy
+     przeciwnicy-gracz
+     gracz-platformy zadajace obrazenia
+    */
 
+    //sprawdzanie czy bohater trafia przeciwnikow atakujac
     if(player_->hero_action_==hero_action::attack1 || player_->hero_action_==hero_action::attack1_left ||
             player_->hero_action_==hero_action::spin_attack || player_->hero_action_==hero_action::spin_attack_left)
     {
@@ -189,7 +220,7 @@ void Game::check_all_collisions()
             if(!el->was_attacked_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite (), el->return_enemy_type ()))
             {
                 el->hp_-=50;
-                std::cout<<"enemy hp:  "<<el->hp_<<std::endl;
+                //std::cout<<"enemy hp:  "<<el->hp_<<std::endl;
                 el->was_attacked_ = true;
             }
         }
@@ -202,22 +233,26 @@ void Game::check_all_collisions()
         }
 
     }
+
+    //sprawdzanie czy bohater dotyka platform zadajcych obrazenia
     for(auto &el : platforms_vector_)
     {
         if(player_->hero_action_!=hero_action::dying && el->damage_platform && collision_->check_platform_damage_collision (player_->return_hero (), el->return_sprite (), player_->return_standing_animation ()))
         {
-
             player_->hp_-=50;
-            std::cout<<"player hp: "<<player_->hp_<<std::endl;
         }
     }
+
+    //sprawdzanie czy bohater nie wypadl za mape
     if(player_->return_hero ().getGlobalBounds ().top > window->getSize ().y && player_->return_hp ()>0)
     {
         player_->hp_-=100;
-        std::cout<<"player hp: "<<player_->hp_<<std::endl;
     }
 
-    //wilk po wykryciu ruchu po danej stronie zaczyna tam biec, dopiero jak jest blisko to zaczyna atakowac
+    /*
+     Najpierw wykrywamy czy bohater sie zbliza, jak osiagnie odpowiednia odleglosc to potwory zaczynaja wykonywac atak
+     (wilk jest wyjatkiem i zaczyna biec, a dopiero jak wie ze trafi to zaczyna atakowac)
+    */
     for(auto &el : enemies_vector_)
     {
         if(el->can_attack_ && collision_->is_player_near (player_->return_hero (), el->return_enemy_sprite () , el->return_enemy_type ()))
@@ -254,6 +289,13 @@ void Game::check_all_collisions()
             }
 
         }
+
+        /*
+            sprawdzanie czy bohater zostal trafiony przez przeciwnika
+            -golem zadaje 100hp
+            -demon i szkielet 50hp
+            -wilk 25hp ale atakuje najszybciej
+        */
         if(el->attacking_ && !el->hited_hero_ && collision_->check_fighting_collision (player_->return_hero (), el->return_enemy_sprite (),el->return_enemy_type ())
                 && el->can_deal_dmg_ )
         {
@@ -270,16 +312,17 @@ void Game::check_all_collisions()
             {
                 player_->hp_-=50;
             }
-            std::cout<<"player hp:"<<player_->hp_<<std::endl;
+
         }
     }
-
-
-
 }
 
 void Game::check_enemy_hp_()
 {
+    /*
+     sprawdzanie czy przeciwnicy umarli, jezeli tak to obiekty sa usuwane
+     jezeli demon umarl (nasz BOSS) to gra sie konczy
+    */
     for(size_t i=0; i<enemies_vector_.size (); i++)
     {
         if(enemies_vector_[i]->dead_==true)
@@ -294,11 +337,16 @@ void Game::check_enemy_hp_()
     }
 }
 
-
 void Game::updatePollEvents()
 {
     sf::Event e;
 
+    /*
+     sprawdzanie wydarzen
+     -zamykanie okna
+     -rozpoczecie gry
+     -klawisz funkcyjny F
+    */
     while (this->window->pollEvent(e))
     {
         if (e.Event::type == sf::Event::Closed)
@@ -331,74 +379,86 @@ void Game::updatePollEvents()
 }
 
 void Game::update()
-{    
+{
+    /*
+    Aktualizowanie wszystkich obiektow ktore tego wymagaja, ustawianie widoku, muzyki,
+    funkcja ta wykonuje sie co petle
+    */
     this->time_ = clock_.restart();              //restartuje zegar
 
-    this->updatePollEvents();
-
-    if(!game_end_)
+    if(!first_loop_)
     {
-    this->hero_x_position_=player_->return_hero_x_position ();
+        this->updatePollEvents();
 
-    if(hero_x_position_>=2880)
-    {
-        this->widok.setCenter (3600, window->getSize ().y/2);
-
-        this->window->setView (widok);
-    }
-    else if(hero_x_position_>= window->getSize ().x/2.0f)
-    {
-        this->widok.setCenter (hero_x_position_, window->getSize ().y/2);
-
-        this->window->setView (widok);
-    }
-    else if (widok.getCenter ().x != 0)
-    {
-        this->widok.setCenter (widok.getSize ().x /2, window->getSize ().y/2);
-        this->window->setView (widok);
-    }
-
-    //kopiowanie platform, na razie tak bo nie mam innego pomyslu
-    this->collision_->vector_collision_platforms_.clear ();
-
-    for(const auto &el : platforms_vector_)
-    {
-        if(!el->damage_platform)
+        if(!game_end_)
         {
-            collision_->copy_platforms (el->return_sprite ());
+            this->hero_x_position_=player_->return_hero_x_position ();
+
+            //ustawianie kamery
+            if(hero_x_position_>=2880)
+            {
+                this->widok.setCenter (3600, window->getSize ().y/2);
+
+                this->window->setView (widok);
+            }
+            else if(hero_x_position_>= window->getSize ().x/2.0f)
+            {
+                this->widok.setCenter (hero_x_position_, window->getSize ().y/2);
+
+                this->window->setView (widok);
+            }
+            else if (widok.getCenter ().x != 0)
+            {
+                this->widok.setCenter (widok.getSize ().x /2, window->getSize ().y/2);
+                this->window->setView (widok);
+            }
+
+            this->collision_->vector_collision_platforms_.clear ();
+
+            for(const auto &el : platforms_vector_)
+            {
+                if(!el->damage_platform)
+                {
+                    collision_->copy_platforms (el->return_sprite ());
+                }
+            }
+
+            for(const auto &el : enemies_vector_)
+            {
+                el->update_enemy ();
+            }
+
+            for(const auto &el : platforms_vector_)
+            {
+                el->update_platform (time_.asSeconds ());
+            }
+
+            this->check_all_collisions ();
+
+            this->player_->update_hero();
+
+            this->check_enemy_hp_();
+        }
+        //ustawianie muzyki przy dojsciu do bossa
+        if(hero_x_position_>=2800 && !second_music_)
+        {
+            second_music_=true;
+            set_music ();
         }
     }
-
-    //dalej
-    for(const auto &el : enemies_vector_)
+    else
     {
-        el->update_enemy ();
+        first_loop_=false;
     }
-
-    for(const auto &el : platforms_vector_)
-    {
-        el->update_platform (time_.asSeconds ());
-    }
-
-    this->check_all_collisions ();
-
-    this->player_->update_hero();
-
-    this->check_enemy_hp_();
-    }
-    if(hero_x_position_>=2800 && !second_music_)
-    {
-        second_music_=true;
-        set_music ();
-    }
-
 
 }
 
 void Game::gamerender()
 {
+    /*
+     rysowanie wszystkich elementow na scenie
+    */
     this->window->clear ();
-
 
     this->background_->render (*this->window);
 
@@ -416,7 +476,7 @@ void Game::gamerender()
 
     if(!game_start_)
     {
-    this->window->draw (sprite_start_);
+        this->window->draw (sprite_start_);
     }
     if(game_end_)
     {

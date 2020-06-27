@@ -43,14 +43,14 @@ new_platform::new_platform(float pos_x, float pos_y, float scale_x, float scale_
     this->moving_left_right_=moving_left_right;
     if(moving_left_right_)
     {
-    if(type_==platform_type::rock_pion)
-    {
-        distance_=sprite_.getGlobalBounds ().height;
-    }
-    else
-    {
-        distance_=sprite_.getGlobalBounds ().width;
-    }
+        if(type_==platform_type::rock_pion)
+        {
+            distance_=sprite_.getGlobalBounds ().height;
+        }
+        else
+        {
+            distance_=sprite_.getGlobalBounds ().width;
+        }
     }
     else
     {
@@ -89,6 +89,9 @@ new_platform::~new_platform()
 
 void new_platform::download_textures ()
 {
+    /*
+     pobieranie odpowiedniej tekstury w zaleznosci od typu platformy
+     */
     sf::Texture tmp;
     switch(type_)
     {
@@ -151,6 +154,9 @@ void new_platform::download_textures ()
 
 void new_platform::set_sprites(float pos_x, float pos_y, float scale_x, float scale_y)
 {
+    /*
+     ustawianie platform, ich tekstury, pozycji i skali
+     */
     sprite_.setTexture (texture_);
     sprite_.setPosition (pos_x,pos_y);
     sprite_.setScale (scale_x,scale_y);
@@ -171,6 +177,9 @@ void new_platform::set_sprites(float pos_x, float pos_y, float scale_x, float sc
 
 void new_platform::set_arm_interaction_(float x, float y)
 {
+    /*
+     ustawianie dzwigni, pozycji, tekstury, skali
+     */
     sf::Texture tmp;
     tmp.loadFromFile ("textures/Assets.png", sf::IntRect(64 , 84, 33, 12));
     texture_interaction_=tmp;
@@ -184,6 +193,9 @@ void new_platform::set_arm_interaction_(float x, float y)
 
 void new_platform::chagne_arm_interaction()
 {
+    /*
+     jezeli zostala nacisnieta dzwignia to zareaguj
+     */
     changed_arm_=true;
     sprite_interaction_.setTextureRect (sf::IntRect(17,0,17,12));                    //wybranie dzwigni w lewo
 
@@ -191,24 +203,27 @@ void new_platform::chagne_arm_interaction()
 
 void new_platform::move_platform(float time)
 {
+    /*
+     ruszanie platformy jezeli zostala nacisnieta dzwignia
+     */
     if(moving_left_right_)
     {
-    if(type_==platform_type::rock_pion)
-    {
-        if(distance_>0)
+        if(type_==platform_type::rock_pion)
         {
-            this->sprite_.move (0,-1*velocity_*time);
-            distance_-=velocity_*time;
+            if(distance_>0)
+            {
+                this->sprite_.move (0,-1*velocity_*time);
+                distance_-=velocity_*time;
+            }
         }
-    }
-    else
-    {
-        if(distance_>0)
+        else
         {
-            this->sprite_.move (-1*velocity_*time,0);
-            distance_-=velocity_*time;
+            if(distance_>0)
+            {
+                this->sprite_.move (-1*velocity_*time,0);
+                distance_-=velocity_*time;
+            }
         }
-    }
     }
     else
     {
@@ -222,10 +237,21 @@ void new_platform::move_platform(float time)
 
 void new_platform::moving_side_to_side(float time)
 {
+    /*
+     ruch platform ktore ruszaja sie lewo/prawo
+     */
     if(moving_right)
     {
-        sprite_.move (0.3*velocity_*time,0);
-        distance_-=0.3*velocity_*time;
+        if(0.3*velocity_*time<5)               //na wypadek jakby czas byl bardzo duzy
+        {
+            sprite_.move (0.3*velocity_*time,0);
+            distance_-=0.3*velocity_*time;
+        }
+        else
+        {
+            sprite_.move (3,0);
+            distance_-=3;
+        }
         if(distance_<=0)
         {
             moving_right=false;
@@ -234,8 +260,16 @@ void new_platform::moving_side_to_side(float time)
     }
     else
     {
-        sprite_.move (-0.3*velocity_*time,0);
-        distance_-=0.3*velocity_*time;
+        if(0.3*velocity_*time<5)               //na wypadek jakby czas byl bardzo duzy
+        {
+            sprite_.move (-0.3*velocity_*time,0);
+            distance_-=0.3*velocity_*time;
+        }
+        else
+        {
+            sprite_.move (-3,0);
+            distance_-=3;
+        }
         if(distance_<=0)
         {
             moving_right=true;
@@ -246,9 +280,11 @@ void new_platform::moving_side_to_side(float time)
 
 void new_platform::update_platform(float time)
 {
+    /*
+     aktualizacja platform
+     */
     if(interaction_switched_)
     {
-
         if(!changed_arm_)
         {
             this->chagne_arm_interaction ();
@@ -262,7 +298,6 @@ void new_platform::update_platform(float time)
 }
 void new_platform::render(sf::RenderWindow &window)
 {
-
     window.draw (sprite_);
     if(this->interaction_)
     {

@@ -1,13 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include <collision.h>
+#include "texture_functions.h"
+#include "collision.h"
 #include "enum_classes.h"
-
 
 class player : public texture_functions
 {

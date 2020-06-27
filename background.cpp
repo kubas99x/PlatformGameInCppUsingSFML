@@ -1,8 +1,5 @@
 #include "background.h"
 #include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-
-
 
 background::background()
 {

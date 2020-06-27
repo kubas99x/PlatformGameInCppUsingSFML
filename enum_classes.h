@@ -2,22 +2,22 @@
 #define ENUM_CLASSES_H
 
 enum class hero_action
-    {
-        standing,
-        standing_left,
-        walking,
-        walking_left,
-        jumping,
-        falling,
-        attack1,
-        attack1_left,
-        dying,
-        spin_attack,
-        spin_attack_left,
-    };
+{
+    standing,
+    standing_left,
+    walking,
+    walking_left,
+    jumping,
+    falling,
+    attack1,
+    attack1_left,
+    dying,
+    spin_attack,
+    spin_attack_left,
+};
 
 enum class enemy_type
-    {
+{
     skeleton,
     wolf,
     golem,

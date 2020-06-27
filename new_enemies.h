@@ -1,7 +1,7 @@
 #ifndef NEW_ENEMIES_H
 #define NEW_ENEMIES_H
 
-#include "SFML/Graphics.hpp"
+#include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
 #include "texture_functions.h"
@@ -42,25 +42,22 @@ private:
     void set_sound_effects();
 
     //variables
-    float enemy_frame_time_;//
-    int enemy_step_standing_;//
+    float enemy_frame_time_;
+    int enemy_step_standing_;
     int enemy_step_dying_;
     int enemy_step_attack_;
     int enemy_step_walking_;
-    bool enemy_animation_change_;//
+    bool enemy_animation_change_;
     bool moving_left_;                  //do ustalania animacji
 
-
-    float waiting_time_;    //             //czas przez ktory wrog stoi i czeka w miejscu
+    float waiting_time_;                //czas przez ktory wrog stoi i czeka w miejscu
     float distance_;
-    float start_position_x_;//
-    float start_position_y_;//
+    float start_position_x_;
+    float start_position_y_;
     float walk_distance_;
     float waiting_time_start_;
     float waiting_for_attack_;
     float velocity_;
-
-
 
     //functions
     void download_textures();
@@ -75,6 +72,10 @@ private:
     void move_wolf();
 
 public:
+    //Constructors
+    new_enemies();
+    new_enemies(const enemy_type &type,float pos_x, float pos_y , float distance, float time);
+
     //enemy variables
     int hp_;
     bool dead_;
@@ -87,9 +88,6 @@ public:
     bool wolf_running_;
     bool move_left;
 
-
-    new_enemies();
-    new_enemies(const enemy_type &type,float pos_x, float pos_y , float distance, float time);
     void render(sf::RenderWindow &window);
     void update_enemy();
     enemy_type return_enemy_type();

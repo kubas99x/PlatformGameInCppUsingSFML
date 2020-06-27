@@ -26,6 +26,9 @@ player::~player()
 
 void player::init_variables()
 {
+    /*
+     ustawianie zmiennych
+     */
     this->hero_step_int_standing_=0;
     this->hero_step_int_walking_=0;
     this->hero_step_int_jumping_=0;
@@ -52,6 +55,9 @@ void player::init_variables()
 
 void player::download_textures()
 {
+    /*
+     pobieranie tekstur bohatera
+     */
     this->textures_.emplace_back(this->get_textures ("textures/standing.png"));      //0      //standing texture
     this->textures_.emplace_back(this->get_textures ("textures/walking.png"));       //1
     this->textures_.emplace_back(this->get_textures ("textures/jumping.png"));       //2
@@ -59,16 +65,17 @@ void player::download_textures()
     this->textures_.emplace_back(this->get_textures ("textures/attack1.png"));       //4     //attack 1
     this->textures_.emplace_back(this->get_textures ("textures/standing_left.png")); //5    //standing left
     this->textures_.emplace_back(this->get_textures ("textures/attack1_left.png"));  //6
-    this->textures_.emplace_back(this->get_textures ("textures/death.png"));        //7
+    this->textures_.emplace_back(this->get_textures ("textures/death.png"));         //7
     this->textures_.emplace_back(this->get_textures ("textures/spin_attack.png"));        //8
-    this->textures_.emplace_back(this->get_textures ("textures/spin_attack_left.png"));        //9
-    this->textures_.emplace_back(this->get_textures ("textures/health_bar.png"));        //10
-
-
+    this->textures_.emplace_back(this->get_textures ("textures/spin_attack_left.png"));   //9
+    this->textures_.emplace_back(this->get_textures ("textures/health_bar.png"));         //10
 }
 
 void player::set_hero()
 {
+    /*
+     ustawianie Sprita bohatera, jego pozycji, hp, animacji
+     */
     this->hero_.setTexture (this->textures_[0]);
     this->hero_.setTextureRect (standing_animations[0]);
     this->hero_.setScale (2.5,2.5);
@@ -81,7 +88,11 @@ void player::set_hero()
 }
 void player::set_sound_effects()
 {
+    /*
+     pobieranie dzwiekow dla bohatera
+     */
     sound.setLoop (true);
+    sound.setVolume (50);
     buffer.emplace_back(load_sound_effect ("music/attack.wav"));
     buffer.emplace_back(load_sound_effect ("music/spin_attack1.wav"));
     buffer.emplace_back(load_sound_effect ("music/hero_dying.wav"));
@@ -90,6 +101,9 @@ void player::set_sound_effects()
 
 void player::set_hero_sprites()
 {
+    /*
+     wycinanie odpowiednij animacji z tekstury i umieszczanie ich w wektorze
+     */
 
     //standing animations
     for(int i=60; i<170*16; i+=170)
@@ -167,6 +181,9 @@ void player::set_hero_sprites()
 
 void player::update_hero_step_int()
 {
+    /*
+     aktualizacja klatki jezeli minal odpowiedni czas dla danej akcji bohatera
+     */
     hero_frame_time_+=time_.asSeconds ();
     if(hero_frame_time_>=1.0f/13.0f && (this->hero_action_==hero_action::standing || this->hero_action_==hero_action::standing_left))
     {
@@ -205,6 +222,9 @@ void player::update_hero_step_int()
 
 void player::choose_hero_animation()
 {
+    /*
+     jezeli nastapila zmiana klatki to ustaw nowa kolejna animacje
+     */
     if(this->hero_animation_change_ && (this->hero_action_==hero_action::standing || this->hero_action_==hero_action::standing_left))               //standing
     {
         if(this->hero_step_int_standing_>=standing_animations.size ()-1)
@@ -297,6 +317,14 @@ void player::choose_hero_animation()
 
 void player::hero_check_moves()
 {
+    /*
+     sprawdzanie ruchow bohatera,
+     skakanie
+     ruch lewo/prawo
+     atak I
+     atak II
+     nie jest mozliwe wykonanie ataku II od razu po ataku I, musi nastapic choć 1 petla przerwy
+     */
     bool any=false;     //bool zeby zmienic animacje na stanie jezeli bohater sie nie rusza
     bool stoped_attacking=false;     //bool zeby miedzy atakami byla chociaz 1 klatka przerwy
     if((sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && this->can_jump_) || this->hero_jumping_)
@@ -418,6 +446,9 @@ void player::hero_check_moves()
 
 void player::hero_gravity_move()
 {
+    /*
+   grawitacja , dzialamy na przyspieszeniu, bohater spada coraz szybciej az do maksymalnej predkosci 10 pikseli/odswiezenie
+     */
 
     if(!collision_-> check_standing_collision (hero_ , velocity_y_+=gravity_*time_.asSeconds (), standing_animations[0]) && !this->hero_jumping_ )                  //sprawdzamy czy bohater stoi na platformie
     {
@@ -435,23 +466,14 @@ void player::hero_gravity_move()
     }
 }
 
-
-
-
-
-float player::return_hero_x_position()
-{
-    return hero_.getPosition ().x;
-}
-
-float player::return_hp()
-{
-    return hp_;
-}
-
 void player::check_hero_hp()
 {
-    //dodaj napis przegranej itp.
+    /*
+     sprawdzanie hp bohatera
+     ustawianie odpowiedniego paska zycia zmiana animacji
+     zmiana  polozenia paska hp jak i wlaczanie odglosu umierania
+     */
+
     if(hero_.getPosition ().x>2880)
     {
         health_bar_.setPosition (2880 , 0);
@@ -513,7 +535,9 @@ void player::check_hero_hp()
 
 void player::update_hero()
 {
-
+    /*
+     aktualizacja bohatera wywolywana co petle gry
+     */
     this->time_ = clock.restart();              //restartuje zegar
 
     this->hero_gravity_move ();                 //sprawdza czy bohater znajduje sie w powietrzu
@@ -529,6 +553,16 @@ void player::update_hero()
 
     this->check_hero_hp ();
 
+}
+
+float player::return_hero_x_position()
+{
+    return hero_.getPosition ().x;
+}
+
+float player::return_hp()
+{
+    return hp_;
 }
 
 void player::get_window_size(const sf::Vector2u &window_s)

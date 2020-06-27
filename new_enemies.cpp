@@ -22,6 +22,9 @@ new_enemies::new_enemies(const enemy_type &type ,float pos_x, float pos_y ,float
 
 void new_enemies::init_variables()
 {
+    /*
+     ustawianie zmiennych
+    */
     this->enemy_step_dying_=0;
     this->enemy_step_standing_=0;
     this->enemy_step_attack_=0;
@@ -39,6 +42,9 @@ void new_enemies::init_variables()
 
 void new_enemies::set_sound_effects()
 {
+    /*
+     pobieranie muzyki w zaleznosci od typu przeciwnika
+    */
     sound.setLoop (false);
     if(enemy_type_==enemy_type::demon)
     {
@@ -53,17 +59,24 @@ void new_enemies::set_sound_effects()
     {
     buffer.emplace_back(load_sound_effect ("music/golem_dying.wav"));
     }
+    if(enemy_type_==enemy_type::wolf)
+    {
+    buffer.emplace_back(load_sound_effect ("music/wolf_dying.wav"));
+    }
 
 }
 
 void new_enemies::download_textures()
 {
+    /*
+     pobieranie tekstur w zaleznosci od typu przeciwnika
+    */
     if(enemy_type_==enemy_type::skeleton)
     {
         texture_.emplace_back(get_textures("textures/skeleton_standing.png"));              //0
-        texture_.emplace_back(get_textures("textures/skeleton_standing_left.png"));        //1
+        texture_.emplace_back(get_textures("textures/skeleton_standing_left.png"));         //1
         texture_.emplace_back(get_textures("textures/skeleton_die.png"));                   //2
-        texture_.emplace_back(get_textures ("textures/skeleton_attack_left.png"));         //3
+        texture_.emplace_back(get_textures ("textures/skeleton_attack_left.png"));          //3
         texture_.emplace_back(get_textures ("textures/skeleton_attack.png"));               //4
     }
     if(enemy_type_==enemy_type::wolf)
@@ -71,27 +84,27 @@ void new_enemies::download_textures()
         texture_.emplace_back(get_textures ("textures/wolf_standing.png"));
         texture_.emplace_back(get_textures ("textures/wolf_standing_left.png"));
         texture_.emplace_back(get_textures ("textures/wolf_death.png"));
-        texture_.emplace_back(get_textures ("textures/wolf_attack_left.png"));         //3
+        texture_.emplace_back(get_textures ("textures/wolf_attack_left.png"));          //3
         texture_.emplace_back(get_textures ("textures/wolf_attack.png"));               //4
-        texture_.emplace_back(get_textures ("textures/wolf_run.png"));             //5
+        texture_.emplace_back(get_textures ("textures/wolf_run.png"));                  //5
         texture_.emplace_back(get_textures ("textures/wolf_run_left.png"));             //6
     }
     if(enemy_type_==enemy_type::golem)
     {
         texture_.emplace_back(get_textures("textures/golem_standing.png"));              //0
-        texture_.emplace_back(get_textures("textures/golem_standing_left.png"));        //1
+        texture_.emplace_back(get_textures("textures/golem_standing_left.png"));         //1
         texture_.emplace_back(get_textures ("textures/golem_death.png"));                //2
-        texture_.emplace_back(get_textures ("textures/golem_attack_left.png"));         //3
+        texture_.emplace_back(get_textures ("textures/golem_attack_left.png"));          //3
         texture_.emplace_back(get_textures ("textures/golem_attack.png"));               //4
-        texture_.emplace_back(get_textures ("textures/golem_walking.png"));             //5
-        texture_.emplace_back(get_textures ("textures/golem_walking_left.png"));             //6
+        texture_.emplace_back(get_textures ("textures/golem_walking.png"));              //5
+        texture_.emplace_back(get_textures ("textures/golem_walking_left.png"));         //6
     }
     if(enemy_type_==enemy_type::demon)
     {
         texture_.emplace_back(get_textures("textures/demon_standing.png"));              //0
-        texture_.emplace_back(get_textures("textures/demon_standing_left.png"));        //1
+        texture_.emplace_back(get_textures("textures/demon_standing_left.png"));         //1
         texture_.emplace_back(get_textures ("textures/demon_death.png"));                //2
-        texture_.emplace_back(get_textures ("textures/demon_attack_left.png"));         //3
+        texture_.emplace_back(get_textures ("textures/demon_attack_left.png"));          //3
         texture_.emplace_back(get_textures ("textures/demon_attack.png"));               //4
         texture_.emplace_back(get_textures ("textures/health_bar_enemy.png"));           //5
     }
@@ -99,7 +112,11 @@ void new_enemies::download_textures()
 
 void new_enemies::set_enemy()
 {
-
+    /*
+     ustawianie zmiennych przeciwnikow,
+     na poczatku ogolnych cech ktore maja wspolne a nastepnie
+     parametrow indywidualnych jak skalam hp, predkosc, czas czekania na atak
+    */
     enemy_sprite_.setTexture (texture_[0]);
     enemy_sprite_.setTextureRect (animations_[enemy_action::standing][0]);
     enemy_sprite_.setPosition (start_position_x_, start_position_y_);
@@ -143,7 +160,7 @@ void new_enemies::set_enemy()
         enemy_action_=enemy_action::standing;
         enemy_sprite_.setScale (2,2);
         move_left=true;
-        hp_=50;
+        hp_=400;
         waiting_for_attack_=3;
         health_bar_.setTexture (texture_[5]);
         health_bar_.setTextureRect (health_animations_[0]);
@@ -159,6 +176,12 @@ void new_enemies::set_enemy()
 }
 void new_enemies::set_animations()
 {
+    /*
+     wycinanie odpowiednich "prostokatow" (klatek animacji) z tekstury,
+     i umieszczanie ich w mapie typu std::map <enemy_action,std::vector<sf::IntRect>>
+     co pozwala nam na latwy dostep do odpowiednich animacji
+     tutaj rowniez ustawiamy odpowiednie klatki animacji w zaleznosci od typu przeciwnika
+    */
     if(enemy_type_==enemy_type::skeleton)
     {
         std::vector <sf::IntRect> tmp_vector;
@@ -436,6 +459,10 @@ void new_enemies::set_animations()
 
 void new_enemies::update_enemy_frame()
 {
+    /*
+     Aktualizacja klatek animacji, jezeli minal odpowiedni czas to jest aktualizowana odpowiednia klatka
+     w zaleznosci od typu ruchu jak i typu przeciwnika ten czas sie lekko rozni
+     */
     enemy_frame_time_+=time_.asSeconds ();
     if(enemy_type_==enemy_type::demon)
     {
@@ -499,6 +526,10 @@ void new_enemies::update_enemy_frame()
 }
 void new_enemies::choose_enemy_animation()
 {
+    /*
+     wybieranie animacji jak i tekstury jezeli nastapila zmiana w akcji przeciwnika lub minal czas
+     i powinna sie zmienic klatka animacji
+     */
     if(this->enemy_animation_change_)
     {
         if(enemy_action_==enemy_action::standing)
@@ -606,6 +637,10 @@ void new_enemies::choose_enemy_animation()
 
 void new_enemies::move_enemy()
 {
+    /*
+     ruszanie sie przeciwnikow jezeli uplynal odpowiedni czas ich czekania w miejscu
+ (czas na ktory mamy wplyw bo ustawiamy go przy tworzeniu onbiektu)
+     */
     if(!attacking_)
     {
         if(waiting_time_<=0)
@@ -621,8 +656,16 @@ void new_enemies::move_enemy()
                     enemy_action_=enemy_action::walking_left;
                 }
 
-                enemy_sprite_.move (-0.25*velocity_*time_.asSeconds (),0);
-                distance_-=0.25*velocity_*time_.asSeconds ();
+                if(0.25*velocity_*time_.asSeconds () < 10)          //warunek by jak zdarzy sie jakies dlugie odswierzenie petli(przy poczatku rozruchu programu) by nie ruszyly za daleko
+                {
+                    enemy_sprite_.move (-0.25*velocity_*time_.asSeconds (),0);
+                    distance_-=0.25*velocity_*time_.asSeconds ();
+                }
+                else
+                {
+                    enemy_sprite_.move (-3,0);
+                    distance_-=3;
+                }
                 if(distance_<=0)
                 {
                     distance_=walk_distance_;
@@ -641,8 +684,16 @@ void new_enemies::move_enemy()
                 {
                     enemy_action_=enemy_action::walking;
                 }
-                enemy_sprite_.move (0.25*velocity_*time_.asSeconds (),0);
-                distance_-=0.25*velocity_*time_.asSeconds ();
+                if(0.25*velocity_*time_.asSeconds () < 10)          //warunek by jak zdarzy sie jakies dlugie odswierzenie petli(przy poczatku rozruchu programu) by nie ruszyly za daleko
+                {
+                    enemy_sprite_.move (0.25*velocity_*time_.asSeconds (),0);
+                    distance_-=0.25*velocity_*time_.asSeconds ();
+                }
+                else
+                {
+                    enemy_sprite_.move (3,0);
+                    distance_-=3;
+                }
                 if(distance_<=0)
                 {
                     distance_=walk_distance_;
@@ -658,6 +709,10 @@ void new_enemies::move_enemy()
 
 void new_enemies::move_wolf()
 {
+    /*
+     dla wilka jest osobna funckja ruchu bo jako jedyny podarza za bohaterem
+     jezeli biegnie to jest przesuwany, jezeli zaczyna atakowac to zmieniamy jego akcje na atak
+     */
     if(wolf_running_)
     {
 
@@ -699,6 +754,10 @@ void new_enemies::move_wolf()
 }
 void new_enemies::attack_stuff()
 {
+    /*
+     odliczanie czasu pomiedzy atakami
+     jezeli minal to przeciwnik znowu moze zaatakowac
+     */
     waiting_for_attack_-=time_.asSeconds ();
     if(waiting_for_attack_<=0)
     {
@@ -719,13 +778,15 @@ void new_enemies::attack_stuff()
 
 void new_enemies::check_hp()
 {
+    /*
+     sprawdzanie punktow zdrowia przeciwnikow,
+     jezeli maja mniej niz 0 to zaczyna sie animacja umierania,
+     puszczay jest rowniez odpowiedni dziwek umierania
+     */
     if(this->hp_<=0 && enemy_action_!=enemy_action::dying)
     {
-        if(enemy_type_==enemy_type::demon || enemy_type_==enemy_type::skeleton)
-        {
-            sound.setBuffer (buffer[0]);
-            sound.play ();
-        }
+        sound.setBuffer (buffer[0]);
+        sound.play ();
         enemy_action_=enemy_action::dying;
         can_deal_dmg_=false;
     }
@@ -791,6 +852,11 @@ void new_enemies::check_hp()
 
 void new_enemies::update_enemy()
 {
+    /*
+     aktualizacja przeciwnika, restartowanie zegara,
+     aktualizacja klatek
+     animacji itp.
+     */
     this->time_=clock.restart ();
     waiting_time_-=time_.asSeconds ();
 
@@ -830,7 +896,7 @@ void new_enemies::update_enemy()
             attack_stuff ();
         }
     }
-    else if (enemy_type_==enemy_type::wolf)
+    else if (enemy_type_==enemy_type::wolf && enemy_action_!=enemy_action::dying)
     {
         this->move_wolf ();
 

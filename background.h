@@ -1,8 +1,11 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
-#include <texture_functions.h>
+
 #include <SFML/Graphics.hpp>
+
 #include <vector>
+
+#include "texture_functions.h"
 
 class background : public texture_functions
 {
@@ -12,7 +15,6 @@ private:
 
     //Sprite vector
     std::vector <sf::Sprite> sprites_;
-
 
     //functions
     void download_textures();

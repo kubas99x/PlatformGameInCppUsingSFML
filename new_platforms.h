@@ -1,9 +1,9 @@
 #ifndef NEW_PLATFORMS_H
 #define NEW_PLATFORMS_H
 
-#include <texture_functions.h>
 #include <SFML/Graphics.hpp>
 
+#include "texture_functions.h"
 #include "enum_classes.h"
 
 class new_platform : public texture_functions
@@ -20,14 +20,12 @@ private:
     platform_type type_;
 
     //do platform z interakcja
-
     sf::Sprite sprite_interaction_;
     sf::Texture texture_interaction_;
     float distance_;
     float distance_tmp_;
     float velocity_=200;
     bool moving_left_right_=true;
-
 
     //platformy ruszajace sie
     bool moving_=false;
@@ -45,6 +43,7 @@ private:
     void moving_side_to_side(float time);
 
 public:
+    //Constructors
     new_platform();
     new_platform(float pos_x , float pos_y , float scale_x, float scale_y , float width, float height, const platform_type &type );
 
@@ -54,6 +53,7 @@ public:
     //platformy z dzwigniami
     new_platform(float pos_x , float pos_y , float scale_x, float scale_y ,float arm_x, float arm_y, const platform_type &type, bool interaction , bool moving_left_right);
     new_platform(float pos_x, float pos_y, float scale_x, float scale_y, float width, float height, float arm_x, float arm_y, const platform_type &type, bool interaction );
+
     ~new_platform();
 
     //interaction

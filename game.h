@@ -1,14 +1,18 @@
 #ifndef GAME_H
 #define GAME_H
+
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+
 #include <vector>
+
 #include "background.h"
 #include "player.h"
 #include "collision.h"
 #include "new_enemies.h"
 #include "new_platforms.h"
+
 class Game
 {
 private:
@@ -37,6 +41,7 @@ private:
     sf::Texture texture_start_;
     sf::Sprite sprite_start_;
     bool game_start_=false;
+    bool first_loop_=true;              //by przy 1 petli nie robic updatu obiektow
 
     //koniec gry
     bool game_end_=false;
@@ -44,9 +49,9 @@ private:
     sf::Font font_;
 
     //music
-    void set_music();
     sf::Music music_;
     bool second_music_;
+    void set_music();
 
     //Private void functions
     void initWindow();
@@ -56,7 +61,6 @@ private:
     void add_platforms();
     void check_enemy_hp_();
     void init_game_start_end();
-
 
 public:
     Game();
